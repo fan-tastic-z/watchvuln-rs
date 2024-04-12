@@ -1,0 +1,17 @@
+database:
+  # Database connection URI
+  uri: {{ get_env(name="DATABASE_URL", default="postgres://postgres:123456@localhost:5432/watchvuln") }}
+  # When enabled, the sql query will be logged.
+  enable_logging: false
+  # Set the timeout duration when acquiring a connection.
+  connect_timeout: 500
+  # Set the idle duration before closing a connection.
+  idle_timeout: 500
+  # Minimum number of connections for a pool.
+  min_connections: 1
+  # Maximum number of connections for a pool.
+  max_connections: 1
+
+task:
+  # every day 7:00-22:00 interval 1 minute Execute task
+  cron_config: "0 */1 7-22 * * *"
