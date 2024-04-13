@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use crate::{environment::Environment, Error, Result};
+use crate::{environment::Environment, logger, Error, Result};
 use fs_err as fs;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
@@ -14,6 +14,7 @@ lazy_static! {
 pub struct Config {
     pub database: Database,
     pub task: Task,
+    pub logger: Logger,
 }
 
 impl Config {
@@ -61,4 +62,30 @@ pub struct Database {
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 pub struct Task {
     pub cron_config: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+pub struct Logger {
+    pub enable: bool,
+
+    /// Enable nice display of backtraces, in development this should be on.
+    /// Turn it off in performance sensitive production deployments.
+    #[serde(default)]
+    pub pretty_backtrace: bool,
+
+    /// Set the logger level.
+    ///
+    /// * options: `trace` | `debug` | `info` | `warn` | `error`
+    pub level: logger::LogLevel,
+
+    /// Set the logger format.
+    ///
+    /// * options: `compact` | `pretty` | `json`
+    pub format: logger::Format,
+
+    /// Override our custom tracing filter.
+    ///
+    /// Set this to your own filter if you want to see traces from internal
+    /// libraries. See more [here](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html#directives)
+    pub override_filter: Option<String>,
 }

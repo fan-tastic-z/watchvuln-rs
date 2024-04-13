@@ -1,3 +1,5 @@
+use std::num::ParseIntError;
+
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
     #[error("{inner}\n{backtrace}")]
@@ -11,6 +13,15 @@ pub enum Error {
 
     #[error(transparent)]
     CronScheduler(#[from] tokio_cron_scheduler::JobSchedulerError),
+
+    #[error(transparent)]
+    Reqwest(#[from] reqwest::Error),
+
+    #[error(transparent)]
+    Regex(#[from] regex::Error),
+
+    #[error(transparent)]
+    ParseInt(#[from] ParseIntError),
 
     #[error(transparent)]
     Tera(#[from] tera::Error),

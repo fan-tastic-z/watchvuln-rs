@@ -21,3 +21,9 @@ tera = "1.19.1"
 
 tokio = { version = "1.33.0", features = ["full"]}
 tokio-cron-scheduler = "0.10.0"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "cookies"] }
+regex = "1.10"
+scraper = "0.19"
+
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
+tracing = "0.1.40"
