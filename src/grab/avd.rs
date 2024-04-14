@@ -37,16 +37,17 @@ impl AVDCrawler {
         }
     }
 
-    pub async fn get_update(&self, page_limit: i32) -> Result<()> {
+    pub async fn get_update(&self, page_limit: i32) -> Result<Vec<VulnInfo>> {
         let mut page_count = self.get_page_count().await?;
         if page_count > page_limit {
             page_count = page_limit;
         }
+        let mut res = Vec::new();
         if let Some(i) = (1..=page_count).next() {
-            println!("{}", i);
-            self.parse_page(i).await?;
+            let data = self.parse_page(i).await?;
+            res.extend(data)
         }
-        Ok(())
+        Ok(res)
     }
 
     pub async fn get_page_count(&self) -> Result<i32> {
@@ -64,7 +65,7 @@ impl AVDCrawler {
         }
     }
 
-    pub async fn parse_page(&self, page: i32) -> Result<()> {
+    pub async fn parse_page(&self, page: i32) -> Result<Vec<VulnInfo>> {
         let page_url = format!("{}?page={}", self.link, page);
         let content = self.help.get_html_content(&page_url).await?;
         let document = Html::parse_document(&content);
@@ -72,11 +73,9 @@ impl AVDCrawler {
         let mut res = Vec::with_capacity(detail_links.len());
         for detail in detail_links {
             let data = self.parse_detail_page(detail.as_ref()).await?;
-            println!("{:?}", data);
             res.push(data)
         }
-        // println!("{:?}", res);
-        Ok(())
+        Ok(res)
     }
 
     fn get_detail_links(&self, document: Html) -> Result<Vec<String>> {
