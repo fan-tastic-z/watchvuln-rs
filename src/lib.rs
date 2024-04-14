@@ -3,6 +3,7 @@ pub mod config;
 pub mod environment;
 pub mod error;
 pub mod grab;
+pub mod help;
 pub mod logger;
 pub mod tera;
 
