@@ -1,0 +1,536 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Aliyun Vulnerability Database">
+
+    <title>阿里云漏洞库</title>
+
+
+    <!-- Bootstrap core CSS -->
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon"/>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/skybox.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bootstrap-icons-1.2.2/font/bootstrap-icons.css">
+    <script src="/static/js/jquery.slim.min.js"></script>
+    <script src="/static/js/popper.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <style>
+        #main .container {
+            min-width: 1300px;
+        }
+
+        #main .attr-item:nth-child(2) {
+            margin-left: 3px;
+            margin-right: 3px;
+        }
+
+        .product-box > div {
+            word-break: break-all;
+        }
+
+        .bs-tooltip-right > .tooltip-inner {
+            min-width: 300px;
+        }
+        .popover{
+            max-width: 100%; /* Max Width of the popover (depending on the container!) */
+        }
+    </style>
+</head>
+<body>
+
+
+
+
+
+
+
+<header class="navigation">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand pl-2 pl-md-4 pr-2" href="/" style="padding: 0;">
+            <img src="/static/img/aliyun-code.png" height="30px" style="margin-bottom: 4px;">
+            <span style="font-size: 24px; font-weight: 500; padding-left: 5px;">
+
+                        阿里云漏洞库
+
+                </span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-target="#navbarsExampleDefault" data-toggle="collapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse collapse" id="navbarsExampleDefault">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+
+                    <a class="nav-link " href="/high-risk/list">高危漏洞</a>
+
+                </li>
+                <li class="nav-item">
+
+                    <a class="nav-link active" href="/nvd/list">CVE 漏洞库</a>
+
+                </li>
+                <li class="nav-item">
+
+                    <a class="nav-link " href="/nonvd/list">非CVE漏洞库</a>
+
+                </li>
+                <li class="nav-item">
+
+                    <a class="nav-link " href="https://xz.aliyun.com/" target="_blank">安全社区</a>
+
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0" action="/search" method="get">
+                <input class="form-control mr-sm-2" type="search" name="q" value=""
+                       placeholder="搜索漏洞"
+                       aria-label="Search" autocomplete="off" style="width: 240px;">
+                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">搜索</button>
+            </form>
+        </div>
+    </nav>
+
+</header>
+
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+
+
+
+<div class="px-lg-5 px-3 py-lg-3 pt-4 bg-white">
+    <div class="row">
+        <div class="col-sm-12 pr-0">
+            <nav class="breadcrumbs">
+
+                <ol class="breadcrumbs__list">
+                    <li class="breadcrumbs__list-item-last CMSBreadCrumbsLink">
+
+                        <a href="http://nvd.nist.gov/vuln/detail/CVE-2024-31861" target="_blank">NVD</a>
+
+                    </li>
+                    <li class="breadcrumbs__list-item-last CMSBreadCrumbsLink">
+                        N/A
+                    </li>
+                    <li class="breadcrumbs__list-item-last CMSBreadCrumbsLink">
+
+                        CVE-2024-31861
+
+                    </li>
+                </ol><!-- .breadcrumbs__list -->
+
+            </nav><!-- .breadcrumbs -->
+        </div>
+    </div>
+
+    <div class="row pt-3">
+        <div class="col-sm-8">
+
+            <div>
+
+                <h5 class="header__title">
+
+
+
+                    <span class="badge btn-warning">高危</span>
+
+
+                    <span class="header__title__text" style="vertical-align: middle;">Apache Zeppelin shell 代码注入漏洞（CVE-2024-31861）</span>
+                </h5>
+
+            </div>
+            <div class="d-flex flex-lg-nowrap flex-wrap justify-content-start pt-2 col-lg-9 col-sm-12 px-0">
+                <!-- .col -->
+                <div class="col-6 col-lg-3 pl-0">
+                    <!-- .metric -->
+                    <div class="metric">
+                        <p class="metric-label"> CVE编号 </p>
+                        <div class="metric-value">CVE-2024-31861</div>
+                    </div><!-- /.metric -->
+                </div><!-- /.col -->
+                <!-- .col -->
+                <div class="col-6 col-lg-3 pl-0">
+                    <!-- .metric -->
+                    <div class="metric">
+                        <p class="metric-label"> 利用情况 </p>
+                        <div class="metric-value">POC 已公开
+                        </div>
+                    </div><!-- .metric -->
+                </div><!-- /.col -->
+                <!-- .col -->
+                <div class="col-6 col-lg-3 pl-0">
+                    <!-- .metric -->
+                    <div class="metric">
+                        <p class="metric-label"> 补丁情况 </p>
+                        <div class="metric-value"> 官方补丁</div>
+                    </div><!-- .metric -->
+                </div><!-- /.col -->
+                <!-- .col -->
+                <div class="col-6 col-lg-3 pl-0">
+                    <!-- .metric -->
+                    <div class="metric">
+                        <p class="metric-label"> 披露时间 </p>
+
+                            <div class="metric-value"> 2024-04-11</div>
+
+                    </div><!-- .metric -->
+                </div><!-- /.col -->
+                <!-- .col -->
+            </div>
+
+        </div>
+        <div class="col-sm-4"></div>
+    </div>
+</div>
+
+<div class="header--severity-high"></div>
+
+<div class="px-lg-5 px-2 bg-light">
+
+    <div class="row pt-2 pb-4">
+
+        <div class="col-sm-8">
+
+
+            <div class="pt-lg-3 pt-1"></div>
+
+            <div class="py-4 pl-4 pr-4 px-2 bg-white rounded shadow-sm" style="border: 1px solid #e5e8ed;">
+
+                    <h6 class="border-bottom border-gray pb-2 mb-0">漏洞描述</h6>
+                    <div class="text-detail pt-2 pb-4">
+
+
+
+                                <div>Apache Zeppelin 是一个让交互式数据分析变得可行的基于网页的开源框架。Zeppelin提供了数据分析、数据可视化等功能。2024年4月11日，官方发布更新披露 CVE-2024-31861 Apache Zeppelin shell 代码注入漏洞，攻击者可利用Zeppelin 中的shell功能执行任意命令。升级后官方默认禁止shell interpreter。</div>
+
+
+
+                                <br/>
+
+
+
+                                <div>影响范围</div>
+
+
+
+                                <div>0.10.1 &lt;= Apache Zeppelin &lt; 0.11.1</div>
+
+
+                    </div>
+
+                    <h6 class="border-bottom border-gray pb-2 mb-0">解决建议</h6>
+                    <div class="text-detail pt-2 pb-4">
+
+                            1、升级至最新版本。<br>2、利用安全组设置其仅对可信地址开放。
+
+                    </div>
+
+                    <div class="text-detail pb-3 pt-2 reference">
+                    <table class="table table-sm table-responsive">
+                        <thead>
+                        <tr>
+                            <th style="border-bottom: 0px solid #dee2e6; padding: 0px 0px 4px 0px;" scope="col">
+                                <h6 style="margin-bottom: 5px;">参考链接</h6>
+                            </th>
+                            <th style="border-bottom: 0px solid #dee2e6; width: 30%;" scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+
+                        <tr>
+                            <td nowrap="nowrap">
+                                <span class="pr-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                         class="feather feather-external-link"><path
+                                            d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline
+                                            points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21"
+                                                                                     y2="3"></line></svg>
+                                </span>
+                                <a href="https://github.com/apache/zeppelin/pull/4708">https://github.com/apache/zeppelin/pull/4708</a>
+                            </td>
+                            <td>
+                                <span class="badge badge-pill badge-secondary"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td nowrap="nowrap">
+                                <span class="pr-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                         class="feather feather-external-link"><path
+                                            d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline
+                                            points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21"
+                                                                                     y2="3"></line></svg>
+                                </span>
+                                <a href="https://github.com/apache/zeppelin/pull/4708/files">https://github.com/apache/zeppelin/pull/4708/files</a>
+                            </td>
+                            <td>
+                                <span class="badge badge-pill badge-secondary"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td nowrap="nowrap">
+                                <span class="pr-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                         class="feather feather-external-link"><path
+                                            d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline
+                                            points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21"
+                                                                                     y2="3"></line></svg>
+                                </span>
+                                <a href="https://lists.apache.org/thread/99clvqrht5l5r6kzjzwg2kj94boc9sfh">https://lists.apache.org/thread/99clvqrht5l5r6kzjzwg2kj94boc9sfh</a>
+                            </td>
+                            <td>
+                                <span class="badge badge-pill badge-secondary"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td nowrap="nowrap">
+                                <span class="pr-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                         class="feather feather-external-link"><path
+                                            d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline
+                                            points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21"
+                                                                                     y2="3"></line></svg>
+                                </span>
+                                <a href="https://www.cve.org/CVERecord?id=CVE-2024-31861">https://www.cve.org/CVERecord?id=CVE-2024-31861</a>
+                            </td>
+                            <td>
+                                <span class="badge badge-pill badge-secondary"></span>
+                            </td>
+                        </tr>
+
+
+                        </tbody>
+                    </table>
+                </div>
+
+
+
+            </div>
+
+
+        </div>
+
+
+        <div class="col-sm-4">
+            <div class="vuln-sidebar-offset">
+
+                <div class="card card--sidebar">
+                    <div class="card__content">
+                        <div class="cvss-breakdown">
+
+                            <header class="cvss-breakdown__header">
+                                <div class="cvss-breakdown__heading">
+                                    阿里云评分 <i class="bi bi-info-circle"
+                                             data-toggle="tooltip"
+                                             data-placement="right"
+                                             style="margin-left: 5px;"
+                                             title="阿里云漏洞脆弱性评分：根据严重性级别（严重，高，中和低）对漏洞进行评级，帮助组织提高其补救效率和有效性，该严重性级别由四个因素决定：技术影响、利用成熟度、风险威胁和受影响数量级。"></i>
+                                </div>
+                                <div class="cvss-breakdown__score cvss-breakdown__score--high">
+
+                                        8.9
+
+                                </div>
+
+                                <div class="cvss-breakdown__severity-bar cvss-breakdown__severity-bar--high">
+                                    <span style="width: 89.0%"></span>
+                                </div>
+                            </header>
+
+                            <ul class="cvss-breakdown__items">
+                                <li class="cvss-breakdown__item">
+                                    <div class="cvss-breakdown__title">攻击路径 <i class="bi bi-info-circle"
+                                                                               data-toggle="tooltip"
+                                                                               data-placement="top"
+                                                                               title="该指标反映了漏洞利用途径"></i></div>
+
+                                    <div class="cvss-breakdown__desc">远程</div>
+                                </li>
+                                <li class="cvss-breakdown__item">
+                                    <div class="cvss-breakdown__title">攻击复杂度</div>
+                                    <div class="cvss-breakdown__desc">容易
+                                    </div>
+                                </li>
+                                <li class="cvss-breakdown__item">
+                                    <div class="cvss-breakdown__title">权限要求</div>
+                                    <div class="cvss-breakdown__desc">普通权限</div>
+                                </li>
+                                <li class="cvss-breakdown__item">
+                                    <div class="cvss-breakdown__title">影响范围</div>
+                                    <div class="cvss-breakdown__desc">全局影响</div>
+                                </li>
+                                <li class="cvss-breakdown__item">
+                                    <div class="cvss-breakdown__title">EXP成熟度 <i class="bi bi-info-circle"
+                                                                                 data-toggle="tooltip"
+                                                                                 data-placement="top"
+                                                                                 title="依托阿里云态势感知系统分析漏洞利用成熟度"></i></div>
+                                    <div class="cvss-breakdown__desc">POC 已公开
+                                    </div>
+                                </li>
+                                <li class="cvss-breakdown__item">
+                                    <div class="cvss-breakdown__title">补丁情况</div>
+                                    <div class="cvss-breakdown__desc">官方补丁
+                                    </div>
+                                </li>
+                                <li class="cvss-breakdown__item">
+                                    <div class="cvss-breakdown__title">数据保密性</div>
+                                    <div class="cvss-breakdown__desc">数据泄露
+                                    </div>
+                                </li>
+                                <li class="cvss-breakdown__item">
+                                    <div class="cvss-breakdown__title">数据完整性</div>
+                                    <div class="cvss-breakdown__desc">传输被破坏</div>
+                                </li>
+                                <li class="cvss-breakdown__item">
+                                    <div class="cvss-breakdown__title">服务器危害</div>
+                                    <div class="cvss-breakdown__desc">服务器失陷</div>
+                                </li>
+                                <li class="cvss-breakdown__item">
+                                    <div class="cvss-breakdown__title">全网数量 <i class="bi bi-info-circle"
+                                                                               data-toggle="tooltip"
+                                                                               data-placement="top"
+                                                                               title="依托阿里云海量数据定位全网使用漏洞相关应用量级"></i>
+                                    </div>
+                                    <div class="cvss-breakdown__desc">N/A</div>
+                                </li>
+                            </ul>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="card card--sidebar">
+                    <div class="card__content">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr style="font-size: 16px; font-weight: 700; line-height: 24px;">
+                                    <td nowrap="nowrap" style="border-top: none;">CWE-ID</td>
+                                    <td nowrap="nowrap" style="border-top: none;width: 70%">漏洞类型</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                <tr>
+                                    <td>
+                                        CWE-94
+                                    </td>
+                                    <td>
+                                        对生成代码的控制不恰当（代码注入）
+                                    </td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card--sidebar">
+                    <div class="card__content">
+                        阿里云安全产品覆盖情况
+                    </div>
+                    <div class="pl-3 pb-3">
+                        <button type="button"
+                                 class="btn btn-sm btn-outline-success" title="阿里云云安全中心已支持该漏洞检测和修复，详情登录云安全中心"
+                                data-toggle="tooltip" >云安全中心
+                        </button>
+                        <button type="button"
+                        class="btn btn-sm btn-outline-secondary disabled"
+                                                        >WAF
+                                                </button>
+                        <button type="button"
+
+                                class="btn btn-sm btn-outline-secondary disabled"
+                                >云防火墙
+                        </button>
+                        <button type="button"
+
+                                class="btn btn-sm btn-outline-secondary disabled"
+                                >RASP
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<div class="modal fade" id="exploit_modal" tabindex="-1" role="dialog" aria-labelledby="exploit_modalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Exp相关链接</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul>
+
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="text-muted bg-dark">
+
+    <div class="px-sm-5 px-3">
+        <p class="float-right">
+            <a class="btn" href="#">回到顶部</a>
+        </p>
+        <p id="footer" style="padding-bottom:10px; border-bottom: 1px solid #595959;">
+            <a class="btn pl-0" href="/about">联系我们</a>
+            <a class="btn" href="/policy">
+                披露原则
+            </a>
+
+        </p>
+        <p class="pt-2"><!-- -->2024<!-- --> Alibaba Cloud Security Team. All Rights Reserved. NVDB备-20230014号.</p>
+    </div>
+
+</footer>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    });
+</script>
+
+</body>
+</html>
+
+<script>
+    $(function () {
+        $('[data-toggle="collapse"]').click(function () {
+            this.remove()
+        })
+    })
+</script>

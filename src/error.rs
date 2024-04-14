@@ -24,6 +24,9 @@ pub enum Error {
     ParseInt(#[from] ParseIntError),
 
     #[error(transparent)]
+    ParseUrl(#[from] url::ParseError),
+
+    #[error(transparent)]
     Tera(#[from] tera::Error),
 
     #[error(transparent)]

@@ -38,7 +38,8 @@ pub async fn run_app(app_context: Arc<AppContext>) -> Result<()> {
     let job = Job::new_async("0 */1 1-22 * * *", move |_uuid, _lock| {
         let app_context_cloned = app_context.clone();
         Box::pin(async move {
-            let _ = my_task(app_context_cloned).await;
+            let res = my_task(app_context_cloned).await;
+            println!("res is {:?}", res)
         })
     })?;
 
@@ -53,7 +54,7 @@ async fn my_task(app_context: Arc<AppContext>) -> Result<()> {
     tracing::info!("{:?}", app_context.config);
 
     tracing::info!("Executing task...");
-    let _avd = AVDCrawler::new();
-    // avd.get_update(1).await?;
+    let avd = AVDCrawler::new();
+    avd.get_update(1).await?;
     Ok(())
 }

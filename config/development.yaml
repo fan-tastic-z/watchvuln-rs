@@ -23,7 +23,7 @@ logger:
   # Enable pretty backtrace (sets RUST_BACKTRACE=1)
   pretty_backtrace: true
   # Log level, options: trace, debug, info, warn or error.
-  level: debug
+  level: info
   # Define the logging format. options: compact, pretty or Json
   format: compact
   # By default the logger has filtering only logs that came from your code or logs that came from `loco` framework. to see all third party libraries
