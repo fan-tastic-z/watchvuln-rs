@@ -30,4 +30,12 @@ impl Help {
         let content = self.http_client.get(url).send().await?.text().await?;
         Ok(content)
     }
+
+    pub async fn post_json<Body>(&self, url: &str, body: &Body) -> Result<reqwest::Response>
+    where
+        Body: serde::Serialize,
+    {
+        let content = self.http_client.post(url).json(body).send().await?;
+        Ok(content)
+    }
 }

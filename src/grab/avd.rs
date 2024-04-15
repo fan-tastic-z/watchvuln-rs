@@ -37,7 +37,7 @@ impl AVDCrawler {
         }
     }
 
-    pub async fn get_update(&self, page_limit: i32) -> Result<Vec<VulnInfo>> {
+    async fn _get_update(&self, page_limit: i32) -> Result<Vec<VulnInfo>> {
         let mut page_count = self.get_page_count().await?;
         if page_count > page_limit {
             page_count = page_limit;

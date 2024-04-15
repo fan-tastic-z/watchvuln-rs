@@ -6,6 +6,7 @@ pub mod grab;
 pub mod help;
 pub mod logger;
 pub mod tera;
+pub mod utils;
 
 use std::{sync::Arc, time::Duration};
 
@@ -15,8 +16,6 @@ use environment::Environment;
 pub use error::Error;
 use tokio::time;
 use tokio_cron_scheduler::{Job, JobScheduler};
-
-use crate::grab::AVDCrawler;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
@@ -55,7 +54,11 @@ async fn my_task(app_context: Arc<AppContext>) -> Result<()> {
     tracing::info!("{:?}", app_context.config);
 
     tracing::info!("Executing task...");
-    let avd = AVDCrawler::new();
-    avd.get_update(1).await?;
+    // let avd = AVDCrawler::new();
+    // avd.get_update(1).await?;
+    // let oscs = OscCrawler::new();
+    // oscs.get_update(1).await?;
+    // oscs.get_page_count().await?;
+    // oscs.get_detail_links("MPS-1nsb-30rg").await?;
     Ok(())
 }

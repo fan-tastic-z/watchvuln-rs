@@ -1,4 +1,5 @@
 pub mod avd;
+pub mod oscs;
 
 pub use avd::AVDCrawler;
 
@@ -16,7 +17,7 @@ pub struct VulnInfo {
     pub tags: Vec<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Severity {
     Low,
     Medium,
