@@ -43,4 +43,3 @@ sea-orm = { version = "1.0.0-rc.3", features = [
     "macros",
 ] }
 migration = { path = "migration" }
-dashmap = "5.5.3"

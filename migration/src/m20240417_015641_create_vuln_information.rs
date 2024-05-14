@@ -17,15 +17,15 @@ impl MigrationTrait for Migration {
             .col(string(VulnInformations::Solutions))
             .col(array_null(
                 VulnInformations::References,
-                ColumnType::string(Some(128)),
+                ColumnType::string(Some(512)),
             ))
             .col(array_null(
                 VulnInformations::Tags,
-                ColumnType::string(Some(128)),
+                ColumnType::string(Some(512)),
             ))
             .col(array_null(
                 VulnInformations::GithubSearch,
-                ColumnType::string(Some(128)),
+                ColumnType::string(Some(512)),
             ))
             .col(string(VulnInformations::From))
             .col(boolean(VulnInformations::Pushed))

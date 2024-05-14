@@ -5,8 +5,7 @@ use tracing::error;
 
 use crate::{
     grab::{Severity, VulnInfo},
-    help::Help,
-    utils::timestamp_to_date,
+    utils::{http_client::Help, timestamp_to_date},
     Error, Result,
 };
 

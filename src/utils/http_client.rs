@@ -1,6 +1,5 @@
-use reqwest::header;
-
 use crate::Result;
+use reqwest::header;
 
 #[derive(Debug, Clone)]
 pub struct Help {

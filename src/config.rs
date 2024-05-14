@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use crate::{environment::Environment, logger, Error, Result};
+use crate::{environment::Environment, logger, utils::render_string, Error, Result};
 use fs_err as fs;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
@@ -33,7 +33,7 @@ impl Config {
             .ok_or_else(|| Error::Message("no configuration file found".to_string()))?;
 
         let content = fs::read_to_string(selected_path)?;
-        let rendered = crate::tera::render_string(&content, &json!({}))?;
+        let rendered = render_string(&content, &json!({}))?;
         serde_yaml::from_str(&rendered)
             .map_err(|err| Error::YAMLFile(err, selected_path.to_string_lossy().to_string()))
     }

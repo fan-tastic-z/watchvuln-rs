@@ -1,19 +1,14 @@
-pub mod cli;
 pub mod config;
 pub mod db;
 pub mod environment;
 pub mod error;
 pub mod grab;
-pub mod grab_manager;
-pub mod help;
 pub mod logger;
 pub mod models;
-pub mod tera;
 pub mod utils;
 
 use std::{collections::HashMap, sync::Arc, time::Duration};
 
-pub use cli::Cli;
 use config::Config;
 use environment::Environment;
 pub use error::Error;
@@ -58,7 +53,7 @@ impl WatchVulnApp {
     pub async fn run(&self) -> Result<()> {
         let self_arc = Arc::new(self.clone());
         let sched = JobScheduler::new().await?;
-        let job = Job::new_async("0 */1 1-22 * * *", move |_uuid, _lock| {
+        let job = Job::new_async("0 */1 1-23 * * *", move |_uuid, _lock| {
             let self_clone = self_arc.clone();
             Box::pin(async move {
                 let res = self_clone.my_task().await;
@@ -75,7 +70,7 @@ impl WatchVulnApp {
 
     async fn my_task(&self) -> Vec<vuln_informations::Model> {
         tracing::info!("{:?}", self.app_context.config);
-        let grab_manager = grab_manager::init();
+        let grab_manager = grab::init();
         let map: HashMap<String, Arc<Box<dyn Grab>>> = grab_manager
             .map
             .into_iter()
@@ -114,10 +109,4 @@ impl WatchVulnApp {
         }
         new_vulns
     }
-
-    // async fn store(&self, vulns: Vec<VulnInfo>) {
-    //     for v in vulns {
-
-    //     }
-    // }
 }

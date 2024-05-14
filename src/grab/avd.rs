@@ -7,7 +7,7 @@ use tracing::{debug, warn};
 
 use crate::{
     grab::{Severity, VulnInfo},
-    help::Help,
+    utils::http_client::Help,
     Error, Result,
 };
 
