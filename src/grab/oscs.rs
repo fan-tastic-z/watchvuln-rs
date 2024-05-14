@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 use tracing::error;
@@ -9,6 +10,8 @@ use crate::{
     Error, Result,
 };
 
+use super::{Grab, Provider};
+
 const OSCS_PAGE_SIZE: i32 = 10;
 
 pub struct OscCrawler {
@@ -16,6 +19,33 @@ pub struct OscCrawler {
     pub display_name: String,
     pub link: String,
     pub help: Help,
+}
+
+#[async_trait]
+impl Grab for OscCrawler {
+    async fn get_update(&self, page_limit: i32) -> Result<Vec<VulnInfo>> {
+        let mut page_count = self.get_page_count().await?;
+        if page_count > page_limit {
+            page_count = page_limit;
+        }
+        let mut res = Vec::new();
+        if let Some(i) = (1..=page_count).next() {
+            let data = self.parse_page(i).await?;
+            res.extend(data)
+        }
+        Ok(res)
+    }
+    fn get_provider(&self) -> Provider {
+        Provider {
+            name: self.name.to_owned(),
+            display_name: self.display_name.to_owned(),
+            link: self.link.to_owned(),
+        }
+    }
+
+    fn get_name(&self) -> String {
+        self.name.to_owned()
+    }
 }
 
 impl Default for OscCrawler {
@@ -33,20 +63,6 @@ impl OscCrawler {
             link: "https://www.oscs1024.com/cm".to_string(),
             help,
         }
-    }
-
-    async fn _get_update(&self, page_limit: i32) -> Result<Vec<VulnInfo>> {
-        let mut page_count = self.get_page_count().await?;
-        if page_count > page_limit {
-            page_count = page_limit;
-        }
-        let mut res = Vec::new();
-        if let Some(i) = (1..=page_count).next() {
-            let data = self.parse_page(i).await?;
-            res.extend(data)
-        }
-        println!("{:?}", res);
-        Ok(res)
     }
 
     pub async fn get_page_count(&self) -> Result<i32> {
@@ -151,6 +167,7 @@ impl OscCrawler {
             solutions,
             from: self.link.clone(),
             tags: vec![],
+            reason: vec![],
         };
         Ok(data)
     }

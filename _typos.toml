@@ -1,4 +1,9 @@
 [default.extend-words]
 
+
 [files]
 extend-exclude = ["CHANGELOG.md", "notebooks/*", "config/development.yaml"]
+
+[default.extend-identifiers]
+vuln_informations = "vuln_informations"
+VulnInformations = "VulnInformations"

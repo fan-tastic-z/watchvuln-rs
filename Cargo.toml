@@ -9,7 +9,7 @@ edition = "2021"
 thiserror = "1"
 clap = { version = "4.5.4", features = ["derive"] }
 
-serde = {version ="1", features = ["derive"]}
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_yaml = "0.9"
 serde_variant = "0.1"
@@ -19,16 +19,28 @@ eyre = "0.6.12"
 fs-err = "2.11"
 tera = "1.19.1"
 
-tokio = { version = "1.33.0", features = ["full"]}
+tokio = { version = "1.33.0", features = ["full"] }
 tokio-cron-scheduler = "0.10.0"
-reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "cookies"] }
+reqwest = { version = "0.12", default-features = false, features = [
+    "json",
+    "rustls-tls",
+    "cookies",
+] }
 url = "2.5"
 regex = "1.10"
-scraper = {version = "0.19", features = ["atomic"]}
+scraper = { version = "0.19", features = ["atomic"] }
 
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
 tracing = "0.1.40"
 
-chrono ={version = "0.4", features = ["serde"]}
+chrono = { version = "0.4", features = ["serde"] }
 
-async-trait = "0.1"
+async-trait = "0.1.74"
+
+sea-orm = { version = "1.0.0-rc.3", features = [
+    "sqlx-postgres",
+    "runtime-tokio-rustls",
+    "macros",
+] }
+migration = { path = "migration" }
+dashmap = "5.5.3"

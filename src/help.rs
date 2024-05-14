@@ -2,6 +2,7 @@ use reqwest::header;
 
 use crate::Result;
 
+#[derive(Debug, Clone)]
 pub struct Help {
     pub http_client: reqwest::Client,
 }

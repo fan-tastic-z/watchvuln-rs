@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use clap::Parser;
 use watchvuln_rs::environment::{resolve_from_env, Environment};
-use watchvuln_rs::{create_context, Cli, Result};
-use watchvuln_rs::{logger, run_app};
+use watchvuln_rs::logger;
+use watchvuln_rs::{create_context, Cli, Result, WatchVulnApp};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -11,6 +11,7 @@ async fn main() -> Result<()> {
     let environment: Environment = cli.environment.unwrap_or_else(resolve_from_env).into();
     let app_context = Arc::new(create_context(&environment).await?);
     logger::init(&app_context.config.logger);
-    run_app(app_context).await?;
+    let app = WatchVulnApp::new(app_context);
+    app.run().await?;
     Ok(())
 }

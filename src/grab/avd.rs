@@ -1,14 +1,17 @@
+use async_trait::async_trait;
 use eyre::eyre;
 use regex::Regex;
 use reqwest::Url;
 use scraper::{Html, Selector};
-use tracing::warn;
+use tracing::{debug, warn};
 
 use crate::{
     grab::{Severity, VulnInfo},
     help::Help,
     Error, Result,
 };
+
+use super::{Grab, Provider};
 
 const PAGE_REGEXP: &str = r"第 \d+ 页 / (\d+) 页 ";
 const CVEID_REGEXP: &str = r"^CVE-\d+-\d+$";
@@ -18,6 +21,33 @@ pub struct AVDCrawler {
     pub display_name: String,
     pub link: String,
     pub help: Help,
+}
+
+#[async_trait]
+impl Grab for AVDCrawler {
+    async fn get_update(&self, page_limit: i32) -> Result<Vec<VulnInfo>> {
+        let mut page_count = self.get_page_count().await?;
+        if page_count > page_limit {
+            page_count = page_limit;
+        }
+        let mut res: Vec<VulnInfo> = Vec::new();
+        if let Some(i) = (1..=page_count).next() {
+            let data = self.parse_page(i).await?;
+            res.extend(data)
+        }
+        Ok(res)
+    }
+    fn get_provider(&self) -> Provider {
+        Provider {
+            name: self.name.to_owned(),
+            display_name: self.display_name.to_owned(),
+            link: self.link.to_owned(),
+        }
+    }
+
+    fn get_name(&self) -> String {
+        self.name.to_owned()
+    }
 }
 
 impl Default for AVDCrawler {
@@ -35,19 +65,6 @@ impl AVDCrawler {
             link: "https://avd.aliyun.com/high-risk/list".to_string(),
             help,
         }
-    }
-
-    async fn _get_update(&self, page_limit: i32) -> Result<Vec<VulnInfo>> {
-        let mut page_count = self.get_page_count().await?;
-        if page_count > page_limit {
-            page_count = page_limit;
-        }
-        let mut res = Vec::new();
-        if let Some(i) = (1..=page_count).next() {
-            let data = self.parse_page(i).await?;
-            res.extend(data)
-        }
-        Ok(res)
     }
 
     pub async fn get_page_count(&self) -> Result<i32> {
@@ -91,7 +108,7 @@ impl AVDCrawler {
     }
 
     pub async fn parse_detail_page(&self, href: &str) -> Result<VulnInfo> {
-        println!("parsing vuln {}", href);
+        debug!("parsing vuln {}", href);
         let detail_url = format!("https://avd.aliyun.com{}", href);
         let content = self.help.get_html_content(&detail_url).await?;
         let url = Url::parse(&detail_url)?;
@@ -148,6 +165,7 @@ impl AVDCrawler {
             solutions,
             from: self.link.clone(),
             tags,
+            reason: vec![],
         };
         Ok(data)
     }
