@@ -1,8 +1,8 @@
+use crate::config;
 use serde::{Deserialize, Serialize};
 use serde_variant::to_variant_name;
-use tracing_subscriber::EnvFilter;
-
-use crate::config;
+use time::macros::{format_description, offset};
+use tracing_subscriber::{fmt::time::OffsetTime, EnvFilter};
 
 const MODULE_WHITELIST: &[&str] = &[
     "watchvuln-rs",
@@ -81,8 +81,12 @@ pub fn init(config: &config::Logger) {
             )
         })
         .expect("logger initialization failed");
-
-    let builder = tracing_subscriber::FmtSubscriber::builder().with_env_filter(filter);
+    let time_fmt =
+        format_description!("[year]-[month]-[day]T[hour]:[minute]:[second].[subsecond digits:3]");
+    let timer = OffsetTime::new(offset!(+8), time_fmt);
+    let builder = tracing_subscriber::FmtSubscriber::builder()
+        .with_env_filter(filter)
+        .with_timer(timer);
 
     match config.format {
         Format::Compact => builder.compact().init(),

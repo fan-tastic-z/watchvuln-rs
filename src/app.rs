@@ -2,7 +2,7 @@ use sea_orm::DatabaseConnection;
 use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::{task::JoinSet, time};
 use tokio_cron_scheduler::{Job, JobScheduler};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use crate::{
     config::Config,
@@ -28,11 +28,11 @@ impl WatchVulnApp {
     pub async fn run(&self) -> Result<()> {
         let self_arc = Arc::new(self.clone());
         let sched = JobScheduler::new().await?;
-        let job = Job::new_async("0 */1 1-23 * * *", move |_uuid, _lock| {
+        let job = Job::new_async("0 */1 7-22 * * *", move |_uuid, _lock| {
             let self_clone = self_arc.clone();
             Box::pin(async move {
                 let res = self_clone.my_task().await;
-                info!("crawling over, result is : {:#?}", res);
+                debug!("crawling over, result is : {:#?}", res);
             })
         })?;
 
