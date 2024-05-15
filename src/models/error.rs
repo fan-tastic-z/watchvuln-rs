@@ -1,7 +1,7 @@
 #[derive(thiserror::Error, Debug)]
 pub enum ModelError {
-    #[error("Entity already exists")]
-    EntityAlreadyExists,
+    #[error("Entity {} already exists", key)]
+    EntityAlreadyExists { key: String },
 
     #[error("Entity not found")]
     EntityNotFound,

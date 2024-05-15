@@ -1,8 +1,9 @@
 use std::sync::Arc;
 
+use watchvuln_rs::app::create_context;
 use watchvuln_rs::environment::{resolve_from_env, Environment};
 use watchvuln_rs::logger;
-use watchvuln_rs::{create_context, Result, WatchVulnApp};
+use watchvuln_rs::{Result, WatchVulnApp};
 
 #[tokio::main]
 async fn main() -> Result<()> {

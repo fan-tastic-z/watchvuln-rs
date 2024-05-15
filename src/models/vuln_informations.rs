@@ -86,7 +86,9 @@ impl super::_entities::vuln_informations::Model {
                 txn.commit().await?;
                 return Ok(m);
             }
-            return Err(ModelError::EntityAlreadyExists {});
+            return Err(ModelError::EntityAlreadyExists {
+                key: vuln.unique_key,
+            });
         }
         vuln.reason.push(REASON_NEW_CREATED.to_owned());
         let v = vuln_informations::ActiveModel {
@@ -117,7 +119,9 @@ impl super::_entities::vuln_informations::Model {
             .await?
             .is_some()
         {
-            return Err(ModelError::EntityAlreadyExists {});
+            return Err(ModelError::EntityAlreadyExists {
+                key: vuln.unique_key,
+            });
         }
         let v = vuln_informations::ActiveModel {
             key: ActiveValue::set(vuln.unique_key),

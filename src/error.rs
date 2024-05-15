@@ -2,11 +2,7 @@ use std::num::ParseIntError;
 
 use migration::sea_orm;
 
-impl From<serde_json::Error> for Error {
-    fn from(val: serde_json::Error) -> Self {
-        Self::JSON(val).bt()
-    }
-}
+pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -88,5 +84,11 @@ impl Error {
                 backtrace: Box::new(backtrace),
             },
         }
+    }
+}
+
+impl From<serde_json::Error> for Error {
+    fn from(val: serde_json::Error) -> Self {
+        Self::JSON(val).bt()
     }
 }

@@ -12,7 +12,6 @@ pub const DEFAULT_ENVIRONMENT: &str = "development";
 
 pub fn resolve_from_env() -> String {
     std::env::var("APP_ENV")
-        .or_else(|_| std::env::var("RAILS_ENV"))
         .or_else(|_| std::env::var("NODE_ENV"))
         .unwrap_or_else(|_| DEFAULT_ENVIRONMENT.to_string())
 }
