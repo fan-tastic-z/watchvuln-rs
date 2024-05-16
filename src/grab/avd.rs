@@ -89,8 +89,11 @@ impl AVDCrawler {
         let detail_links = self.get_detail_links(document)?;
         let mut res = Vec::with_capacity(detail_links.len());
         for detail in detail_links {
-            let data = self.parse_detail_page(detail.as_ref()).await?;
-            res.push(data)
+            let data = self.parse_detail_page(detail.as_ref()).await;
+            match data {
+                Ok(data) => res.push(data),
+                Err(err) => warn!("crawing detail {} error {}", detail, err),
+            }
         }
         Ok(res)
     }

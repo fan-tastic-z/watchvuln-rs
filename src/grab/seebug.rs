@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use eyre::eyre;
 use scraper::{ElementRef, Html, Selector};
+use tracing::warn;
 
 use crate::grab::{Severity, VulnInfo};
 use crate::utils::http_client::Help;
@@ -90,16 +91,48 @@ impl SeeBugCrawler {
         }
         let mut res = Vec::with_capacity(tr_elements.len());
         for el in tr_elements {
-            let (href, unique_key) = self.get_href(el)?;
-            let disclosure = self.get_disclosure(el)?;
-            let severity_title = self.get_severity_title(el)?;
-            let title = self.get_title(el)?;
-            let cve_id = self.get_cve_id(el)?;
-            let tag = self.get_tag(el)?;
-            println!(
-                "href is {}, key is {} disclosure is {} severity_title is {} title is {} cve id is {}",
-                href, unique_key, disclosure, severity_title, title, cve_id
-            );
+            let (href, unique_key) = match self.get_href(el) {
+                Ok((href, unique_key)) => (href, unique_key),
+                Err(e) => {
+                    warn!("seebug get href error {}", e);
+                    continue;
+                }
+            };
+            let disclosure = match self.get_disclosure(el) {
+                Ok(disclosure) => disclosure,
+                Err(e) => {
+                    warn!("seebug get disclosure error {}", e);
+                    continue;
+                }
+            };
+            let severity_title = match self.get_severity_title(el) {
+                Ok(severity_title) => severity_title,
+                Err(e) => {
+                    warn!("seebug get severity title error {}", e);
+                    continue;
+                }
+            };
+            let title = match self.get_title(el) {
+                Ok(title) => title,
+                Err(e) => {
+                    warn!("seebug get title error {}", e);
+                    continue;
+                }
+            };
+            let cve_id = match self.get_cve_id(el) {
+                Ok(cve_id) => cve_id,
+                Err(e) => {
+                    warn!("seebug get cve_id error {}", e);
+                    "".to_string()
+                }
+            };
+            let tag = match self.get_tag(el) {
+                Ok(tag) => tag,
+                Err(e) => {
+                    warn!("seebug get tag error {}", e);
+                    continue;
+                }
+            };
             let severity = match severity_title.as_str() {
                 "低危" => Severity::Low,
                 "中危" => Severity::Medium,
@@ -119,7 +152,7 @@ impl SeeBugCrawler {
                 disclosure,
                 references: vec![],
                 solutions: "".to_owned(),
-                from: self.link.clone(),
+                from: href,
                 tags,
                 reason: vec![],
             };
