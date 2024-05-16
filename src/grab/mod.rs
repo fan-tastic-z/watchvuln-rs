@@ -1,5 +1,6 @@
 pub mod avd;
 pub mod oscs;
+pub mod seebug;
 
 use std::{collections::HashMap, fmt};
 
@@ -7,7 +8,7 @@ use crate::Result;
 use async_trait::async_trait;
 pub use avd::AVDCrawler;
 
-use self::oscs::OscCrawler;
+use self::{oscs::OscCrawler, seebug::SeeBugCrawler};
 
 #[derive(Debug, Clone)]
 pub struct VulnInfo {
@@ -75,5 +76,6 @@ pub fn init() -> GrabManager {
     let mut manager = GrabManager::new();
     manager.register(Box::new(OscCrawler::new()));
     manager.register(Box::new(AVDCrawler::new()));
+    manager.register(Box::new(SeeBugCrawler::new()));
     manager
 }
