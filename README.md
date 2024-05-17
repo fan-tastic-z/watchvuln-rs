@@ -24,6 +24,8 @@
 sea-orm-cli migrate up
 ```
 
+## telegram 推送效果
+
 ![app](./assets/app.jpg)
 
 参考GO版本的：<https://github.com/zema1/watchvuln>
