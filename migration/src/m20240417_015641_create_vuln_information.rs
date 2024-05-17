@@ -27,6 +27,10 @@ impl MigrationTrait for Migration {
                 VulnInformations::GithubSearch,
                 ColumnType::string(Some(512)),
             ))
+            .col(array_null(
+                VulnInformations::Reasons,
+                ColumnType::string(Some(512)),
+            ))
             .col(string(VulnInformations::From))
             .col(boolean(VulnInformations::Pushed))
             .to_owned();
@@ -74,6 +78,7 @@ enum VulnInformations {
     References,
     Tags,
     GithubSearch,
+    Reasons,
     From,
     Pushed,
 }

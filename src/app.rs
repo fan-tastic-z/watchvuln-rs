@@ -2,14 +2,15 @@ use sea_orm::DatabaseConnection;
 use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::{task::JoinSet, time};
 use tokio_cron_scheduler::{Job, JobScheduler};
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 
 use crate::{
     config::Config,
     db,
     environment::Environment,
-    grab::{self, Grab},
-    models::_entities::vuln_informations,
+    grab::{self, Grab, Severity},
+    models::_entities::vuln_informations::{self, Model},
+    push::{msg_template::reader_vulninfo, telegram::Telegram},
     Result,
 };
 
@@ -28,22 +29,23 @@ impl WatchVulnApp {
     pub async fn run(&self) -> Result<()> {
         let self_arc = Arc::new(self.clone());
         let sched = JobScheduler::new().await?;
-        let job = Job::new_async("0 */1 7-22 * * *", move |_uuid, _lock| {
+        let job = Job::new_async("0 */1 2-23 * * *", move |_uuid, _lock| {
             let self_clone = self_arc.clone();
             Box::pin(async move {
-                let res = self_clone.my_task().await;
-                debug!("crawling over, result is : {:#?}", res);
+                let res = self_clone.crawling_task().await;
+                info!("crawling over, result is : {:#?}", res);
+                self_clone.push(res).await;
             })
         })?;
 
         sched.add(job).await?;
         sched.start().await?;
         loop {
-            time::sleep(Duration::from_secs(10)).await;
+            time::sleep(Duration::from_secs(60)).await;
         }
     }
 
-    async fn my_task(&self) -> Vec<vuln_informations::Model> {
+    async fn crawling_task(&self) -> Vec<Model> {
         tracing::info!("{:?}", self.app_context.config);
         let grab_manager = grab::init();
         let map: HashMap<String, Arc<Box<dyn Grab>>> = grab_manager
@@ -68,6 +70,7 @@ impl WatchVulnApp {
                             match create_res {
                                 Ok(m) => {
                                     info!("found new vuln:{}", m.key);
+
                                     new_vulns.push(m)
                                 }
                                 Err(e) => {
@@ -83,6 +86,30 @@ impl WatchVulnApp {
         }
         new_vulns
     }
+
+    async fn push(&self, vulns: Vec<Model>) {
+        for vuln in vulns.into_iter() {
+            if vuln.severtiy == Severity::Critical.to_string()
+                || vuln.severtiy == Severity::Critical.to_string()
+            {
+                if vuln.pushed {
+                    info!("{} has been pushed, skipped", vuln.key);
+                    continue;
+                }
+                let key = vuln.key.clone();
+                let msg = match reader_vulninfo(vuln.into()) {
+                    Ok(msg) => msg,
+                    Err(err) => {
+                        warn!("reader vulninfo {} error {}", key, err);
+                        continue;
+                    }
+                };
+                if let Err(err) = self.app_context.tg_bot.push_markdown(msg.clone()).await {
+                    warn!("push vuln {} msg {} error: {}", key, msg, err);
+                };
+            }
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -90,14 +117,17 @@ pub struct AppContext {
     pub environment: Environment,
     pub config: Config,
     pub db: DatabaseConnection,
+    pub tg_bot: Telegram,
 }
 
 pub async fn create_context(environment: &Environment) -> Result<AppContext> {
     let config = environment.load()?;
     let db = db::connect(&config.database).await?;
+    let tg_bot = Telegram::new(config.tg_bot.token.clone(), config.tg_bot.chat_id);
     Ok(AppContext {
         environment: environment.clone(),
         config,
         db,
+        tg_bot,
     })
 }

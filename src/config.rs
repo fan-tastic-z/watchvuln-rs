@@ -15,6 +15,7 @@ pub struct Config {
     pub database: Database,
     pub task: Task,
     pub logger: Logger,
+    pub tg_bot: TgBot,
 }
 
 impl Config {
@@ -88,4 +89,10 @@ pub struct Logger {
     /// Set this to your own filter if you want to see traces from internal
     /// libraries. See more [here](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html#directives)
     pub override_filter: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+pub struct TgBot {
+    pub chat_id: i64,
+    pub token: String,
 }

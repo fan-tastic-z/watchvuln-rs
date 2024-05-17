@@ -154,7 +154,7 @@ impl SeeBugCrawler {
                 solutions: "".to_owned(),
                 from: href,
                 tags,
-                reason: vec![],
+                reasons: vec![],
             };
             res.push(data);
         }

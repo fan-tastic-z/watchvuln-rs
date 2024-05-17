@@ -20,6 +20,7 @@ pub struct Model {
     pub references: Option<Vec<String>>,
     pub tags: Option<Vec<String>>,
     pub github_search: Option<Vec<String>>,
+    pub reasons: Option<Vec<String>>,
     pub from: String,
     pub pushed: bool,
 }

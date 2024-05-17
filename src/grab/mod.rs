@@ -4,13 +4,14 @@ pub mod seebug;
 
 use std::{collections::HashMap, fmt};
 
-use crate::Result;
+use crate::{models::_entities::vuln_informations::Model, Result};
 use async_trait::async_trait;
 pub use avd::AVDCrawler;
+use serde::{Deserialize, Serialize};
 
 use self::{oscs::OscCrawler, seebug::SeeBugCrawler};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct VulnInfo {
     pub unique_key: String,
     pub title: String,
@@ -22,10 +23,51 @@ pub struct VulnInfo {
     pub solutions: String,
     pub from: String,
     pub tags: Vec<String>,
-    pub reason: Vec<String>,
+    pub reasons: Vec<String>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+impl From<Model> for VulnInfo {
+    fn from(v: Model) -> Self {
+        let severtiy = match v.severtiy.as_str() {
+            "低危" => Severity::Low,
+            "中危" => Severity::Medium,
+            "高危" => Severity::High,
+            "严重" => Severity::Critical,
+            _ => Severity::Low,
+        };
+
+        let references = match v.references {
+            Some(references) => references,
+            None => Vec::new(),
+        };
+
+        let tags = match v.tags {
+            Some(tags) => tags,
+            None => Vec::new(),
+        };
+
+        let reasons = match v.reasons {
+            Some(reasons) => reasons,
+            None => Vec::new(),
+        };
+
+        VulnInfo {
+            unique_key: v.key,
+            title: v.title,
+            description: v.description,
+            severity: severtiy,
+            cve: v.cve,
+            disclosure: v.disclosure,
+            references,
+            solutions: v.solutions,
+            from: v.from,
+            tags,
+            reasons,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub enum Severity {
     Low,
     Medium,

@@ -6,6 +6,7 @@ pub mod error;
 pub mod grab;
 pub mod logger;
 pub mod models;
+pub mod push;
 pub mod utils;
 
 pub use error::Error;

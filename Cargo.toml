@@ -48,3 +48,4 @@ sea-orm = { version = "1.0.0-rc.3", features = [
     "macros",
 ] }
 migration = { path = "migration" }
+teloxide = { version = "0.12", features = ["macros"] }

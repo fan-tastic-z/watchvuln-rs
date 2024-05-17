@@ -168,7 +168,7 @@ impl AVDCrawler {
             solutions,
             from: self.link.clone(),
             tags,
-            reason: vec![],
+            reasons: vec![],
         };
         Ok(data)
     }

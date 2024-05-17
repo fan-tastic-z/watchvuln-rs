@@ -47,7 +47,8 @@ impl super::_entities::vuln_informations::Model {
                     vuln_model.severtiy.as_ref(),
                     vuln.severity
                 );
-                vuln.reason.push(reason);
+                vuln.reasons.push(reason);
+
                 as_new_vuln = true
             }
 
@@ -69,7 +70,7 @@ impl super::_entities::vuln_informations::Model {
                         vuln_model.tags.as_ref(),
                         vuln.tags
                     );
-                    vuln.reason.push(reason);
+                    vuln.reasons.push(reason);
                     as_new_vuln = true
                 }
             }
@@ -82,6 +83,7 @@ impl super::_entities::vuln_informations::Model {
                 vuln_model.references = ActiveValue::set(Some(vuln.references));
                 vuln_model.tags = ActiveValue::set(Some(vuln.tags));
                 vuln_model.from = ActiveValue::set(vuln.from);
+                vuln_model.reasons = ActiveValue::set(Some(vuln.reasons));
                 let m = vuln_model.update(&txn).await?;
                 txn.commit().await?;
                 return Ok(m);
@@ -90,7 +92,7 @@ impl super::_entities::vuln_informations::Model {
                 key: vuln.unique_key,
             });
         }
-        vuln.reason.push(REASON_NEW_CREATED.to_owned());
+        vuln.reasons.push(REASON_NEW_CREATED.to_owned());
         let v = vuln_informations::ActiveModel {
             key: ActiveValue::set(vuln.unique_key),
             title: ActiveValue::set(vuln.title),
@@ -103,6 +105,7 @@ impl super::_entities::vuln_informations::Model {
             tags: ActiveValue::set(Some(vuln.tags)),
             from: ActiveValue::set(vuln.from),
             pushed: ActiveValue::set(false),
+            reasons: ActiveValue::set(Some(vuln.reasons)),
             ..Default::default()
         }
         .insert(&txn)

@@ -166,7 +166,7 @@ impl OscCrawler {
             solutions,
             from: self.link.clone(),
             tags: vec![],
-            reason: vec![],
+            reasons: vec![],
         };
         Ok(data)
     }
