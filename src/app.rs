@@ -2,7 +2,7 @@ use sea_orm::DatabaseConnection;
 use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::{task::JoinSet, time};
 use tokio_cron_scheduler::{Job, JobScheduler};
-use tracing::{info, warn};
+use tracing::{debug, info, warn};
 
 use crate::{
     config::Config,
@@ -29,11 +29,12 @@ impl WatchVulnApp {
     pub async fn run(&self) -> Result<()> {
         let self_arc = Arc::new(self.clone());
         let sched = JobScheduler::new().await?;
-        let job = Job::new_async("0 */1 2-23 * * *", move |_uuid, _lock| {
+        let schedule = self.app_context.config.task.cron_config.as_str();
+        let job = Job::new_async(schedule, move |_uuid, _lock| {
             let self_clone = self_arc.clone();
             Box::pin(async move {
                 let res = self_clone.crawling_task().await;
-                info!("crawling over, result is : {:#?}", res);
+                debug!("crawling over, result is : {:#?}", res);
                 self_clone.push(res).await;
             })
         })?;
@@ -107,6 +108,11 @@ impl WatchVulnApp {
                 if let Err(err) = self.app_context.tg_bot.push_markdown(msg.clone()).await {
                     warn!("push vuln {} msg {} error: {}", key, msg, err);
                 };
+                if let Err(err) =
+                    vuln_informations::Model::update_pushed_by_key(&self.app_context.db, key).await
+                {
+                    warn!("update vuln {} pushed error: {}", msg, err);
+                }
             }
         }
     }

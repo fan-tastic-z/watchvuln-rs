@@ -14,7 +14,7 @@ database:
 
 task:
   # every day 7:00-22:00 interval 1 minute Execute task
-  cron_config: "0 */1 7-22 * * *"
+  cron_config: "0 */1 7-23 * * *"
 
 # Application logging configuration
 logger:

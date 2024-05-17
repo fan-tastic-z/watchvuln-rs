@@ -6,6 +6,9 @@ pub enum ModelError {
     #[error("Entity not found")]
     EntityNotFound,
 
+    #[error("Entity update not found by key: {}", key)]
+    EntityUpdateNotFound { key: String },
+
     #[error(transparent)]
     DbErr(#[from] sea_orm::DbErr),
 
