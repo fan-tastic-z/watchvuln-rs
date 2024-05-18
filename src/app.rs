@@ -71,7 +71,6 @@ impl WatchVulnApp {
                             match create_res {
                                 Ok(m) => {
                                     info!("found new vuln:{}", m.key);
-
                                     new_vulns.push(m)
                                 }
                                 Err(e) => {
