@@ -1,5 +1,5 @@
 use crate::Result;
-use reqwest::header;
+use reqwest::header::{self, HeaderMap};
 
 #[derive(Debug, Clone)]
 pub struct Help {
@@ -8,12 +8,13 @@ pub struct Help {
 
 impl Default for Help {
     fn default() -> Self {
-        Self::new()
+        let headers = header::HeaderMap::new();
+        Self::new(headers)
     }
 }
 impl Help {
-    pub fn new() -> Self {
-        let mut headers = header::HeaderMap::new();
+    pub fn new(mut headers: HeaderMap) -> Self {
+        // let mut headers = header::HeaderMap::new();
         headers.insert("User-Agent", header::HeaderValue::from_static("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"));
         let client = reqwest::Client::builder()
             .redirect(reqwest::redirect::Policy::none())
@@ -21,6 +22,7 @@ impl Help {
             .default_headers(headers)
             .build()
             .unwrap();
+
         Help {
             http_client: client,
         }

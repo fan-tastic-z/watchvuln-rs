@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use chrono::{DateTime, FixedOffset};
+use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
@@ -55,7 +56,8 @@ impl Default for OscCrawler {
 
 impl OscCrawler {
     pub fn new() -> Self {
-        let help = Help::new();
+        let headers = header::HeaderMap::new();
+        let help = Help::new(headers);
         OscCrawler {
             name: "oscs".to_string(),
             display_name: "OSCS开源安全情报预警".to_string(),

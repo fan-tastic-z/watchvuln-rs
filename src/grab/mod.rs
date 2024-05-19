@@ -2,6 +2,7 @@ pub mod avd;
 pub mod kev;
 pub mod oscs;
 pub mod seebug;
+pub mod ti;
 
 use std::{collections::HashMap, fmt};
 
@@ -10,7 +11,7 @@ use async_trait::async_trait;
 pub use avd::AVDCrawler;
 use serde::{Deserialize, Serialize};
 
-use self::{kev::KevCrawler, oscs::OscCrawler, seebug::SeeBugCrawler};
+use self::{kev::KevCrawler, oscs::OscCrawler, seebug::SeeBugCrawler, ti::TiCrawler};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct VulnInfo {
@@ -121,5 +122,6 @@ pub fn init() -> GrabManager {
     manager.register(Box::new(AVDCrawler::new()));
     manager.register(Box::new(SeeBugCrawler::new()));
     manager.register(Box::new(KevCrawler::new()));
+    manager.register(Box::new(TiCrawler::new()));
     manager
 }

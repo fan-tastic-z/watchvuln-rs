@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use eyre::eyre;
 use regex::Regex;
-use reqwest::Url;
+use reqwest::{header, Url};
 use scraper::{Html, Selector};
 use tracing::{debug, warn};
 
@@ -58,7 +58,8 @@ impl Default for AVDCrawler {
 
 impl AVDCrawler {
     pub fn new() -> AVDCrawler {
-        let help = Help::new();
+        let headers = header::HeaderMap::new();
+        let help = Help::new(headers);
         AVDCrawler {
             name: "aliyun-avd".to_string(),
             display_name: "阿里云漏洞库".to_string(),

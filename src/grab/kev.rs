@@ -2,6 +2,7 @@ use std::usize;
 
 use async_trait::async_trait;
 use chrono::{DateTime, FixedOffset};
+use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
 
 use super::{Grab, Provider, VulnInfo};
@@ -79,7 +80,8 @@ impl Default for KevCrawler {
 
 impl KevCrawler {
     pub fn new() -> KevCrawler {
-        let help = Help::new();
+        let headers = header::HeaderMap::new();
+        let help = Help::new(headers);
         KevCrawler {
             name: "KevCrawler".to_string(),
             display_name: "Known Exploited Vulnerabilities Catalog".to_string(),

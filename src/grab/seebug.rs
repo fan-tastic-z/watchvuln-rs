@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use eyre::eyre;
+use reqwest::header::{self};
 use scraper::{ElementRef, Html, Selector};
 use tracing::warn;
 
@@ -51,7 +52,8 @@ impl Default for SeeBugCrawler {
 
 impl SeeBugCrawler {
     pub fn new() -> SeeBugCrawler {
-        let help = Help::new();
+        let headers = header::HeaderMap::new();
+        let help = Help::new(headers);
         SeeBugCrawler {
             name: "seebug".to_string(),
             display_name: "Seebug 漏洞平台".to_string(),
