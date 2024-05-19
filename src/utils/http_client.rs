@@ -26,6 +26,11 @@ impl Help {
         }
     }
 
+    pub async fn get_json(&self, url: &str) -> Result<reqwest::Response> {
+        let content = self.http_client.get(url).send().await?;
+        Ok(content)
+    }
+
     pub async fn get_html_content(&self, url: &str) -> Result<String> {
         let content = self.http_client.get(url).send().await?.text().await?;
         Ok(content)

@@ -1,4 +1,5 @@
 pub mod avd;
+pub mod kev;
 pub mod oscs;
 pub mod seebug;
 
@@ -9,7 +10,7 @@ use async_trait::async_trait;
 pub use avd::AVDCrawler;
 use serde::{Deserialize, Serialize};
 
-use self::{oscs::OscCrawler, seebug::SeeBugCrawler};
+use self::{kev::KevCrawler, oscs::OscCrawler, seebug::SeeBugCrawler};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct VulnInfo {
@@ -119,5 +120,6 @@ pub fn init() -> GrabManager {
     manager.register(Box::new(OscCrawler::new()));
     manager.register(Box::new(AVDCrawler::new()));
     manager.register(Box::new(SeeBugCrawler::new()));
+    manager.register(Box::new(KevCrawler::new()));
     manager
 }
