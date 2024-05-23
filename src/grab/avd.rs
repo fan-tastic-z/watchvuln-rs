@@ -85,8 +85,7 @@ impl AVDCrawler {
 
     pub async fn parse_page(&self, page: i32) -> Result<Vec<VulnInfo>> {
         let page_url = format!("{}?page={}", self.link, page);
-        let content = self.help.get_html_content(&page_url).await?;
-        let document = Html::parse_document(&content);
+        let document = self.get_document(&page_url).await?;
         let detail_links = self.get_detail_links(document)?;
         let mut res = Vec::with_capacity(detail_links.len());
         for detail in detail_links {
@@ -114,33 +113,28 @@ impl AVDCrawler {
     pub async fn parse_detail_page(&self, href: &str) -> Result<VulnInfo> {
         debug!("parsing vuln {}", href);
         let detail_url = format!("https://avd.aliyun.com{}", href);
-        let content = self.help.get_html_content(&detail_url).await?;
-        let url = Url::parse(&detail_url)?;
-        let avd_id = url
-            .query_pairs()
-            .filter(|(key, _)| key == "id")
-            .map(|(_, value)| value)
-            .collect::<Vec<_>>();
-        let avd_id = avd_id[0].to_string();
-        let mut tags = Vec::new();
-        let document = Html::parse_document(&content);
 
-        let mut cve_id = self.get_cve_id(&document)?;
+        let document = self.get_document(&detail_url).await?;
+
+        let avd_id = self.get_avd_id(&detail_url)?;
+
+        let cve_id = self.get_cve_id(&document)?;
+        if cve_id.is_empty() {
+            warn!("cve id not found in {}", href);
+        }
+
         let utilization = self.get_utilization(&document)?;
         let disclosure = self.get_disclosure(&document)?;
+        let mut tags = Vec::new();
         if utilization != "暂无" {
             tags.push(utilization);
         }
 
-        if !Regex::new(CVEID_REGEXP)?.is_match(&cve_id) {
-            warn!("cve id not found in {}", href);
-            cve_id = "".to_string();
-        }
         if cve_id.is_empty() && disclosure.is_empty() {
             return Err(eyre!("invalid vuln data in {}", href).into());
         }
 
-        let level = self.get_level(&document)?;
+        let severity = self.get_severity(&document)?;
 
         let title = self.get_title(&document)?;
 
@@ -149,14 +143,6 @@ impl AVDCrawler {
         let solutions = self.get_solutions(&document)?;
 
         let references = self.get_references(&document)?;
-
-        let severity = match level.as_str() {
-            "低危" => Severity::Low,
-            "中危" => Severity::Medium,
-            "高危" => Severity::High,
-            "严重" => Severity::Critical,
-            _ => Severity::Low,
-        };
 
         let data = VulnInfo {
             unique_key: avd_id,
@@ -172,6 +158,17 @@ impl AVDCrawler {
             reasons: vec![],
         };
         Ok(data)
+    }
+
+    fn get_avd_id(&self, detail_url: &str) -> Result<String> {
+        let url = Url::parse(detail_url)?;
+        let avd_id = url
+            .query_pairs()
+            .filter(|(key, _)| key == "id")
+            .map(|(_, value)| value)
+            .collect::<Vec<_>>();
+        let avd_id = avd_id[0].to_string();
+        Ok(avd_id)
     }
 
     fn get_references(&self, document: &Html) -> Result<Vec<String>> {
@@ -222,7 +219,7 @@ impl AVDCrawler {
         Ok(title)
     }
 
-    fn get_level(&self, document: &Html) -> Result<String> {
+    fn get_severity(&self, document: &Html) -> Result<Severity> {
         let level_selector = Selector::parse("h5[class='header__title'] .badge").unwrap();
         let level = document
             .select(&level_selector)
@@ -231,7 +228,14 @@ impl AVDCrawler {
             .inner_html()
             .trim()
             .to_string();
-        Ok(level)
+        let severity = match level.as_str() {
+            "低危" => Severity::Low,
+            "中危" => Severity::Medium,
+            "高危" => Severity::High,
+            "严重" => Severity::Critical,
+            _ => Severity::Low,
+        };
+        Ok(severity)
     }
 
     fn get_mertric_value(&self, document: &Html, index: usize) -> Result<String> {
@@ -248,7 +252,12 @@ impl AVDCrawler {
     }
 
     fn get_cve_id(&self, document: &Html) -> Result<String> {
-        self.get_mertric_value(document, 0)
+        let mut cve_id = self.get_mertric_value(document, 0)?;
+        if !Regex::new(CVEID_REGEXP)?.is_match(&cve_id) {
+            // warn!("cve id not found in {}", href);
+            cve_id = "".to_string();
+        }
+        Ok(cve_id)
     }
 
     fn get_utilization(&self, document: &Html) -> Result<String> {
@@ -257,5 +266,53 @@ impl AVDCrawler {
 
     fn get_disclosure(&self, document: &Html) -> Result<String> {
         self.get_mertric_value(document, 3)
+    }
+
+    async fn get_document(&self, url: &str) -> Result<Html> {
+        let content = self.help.get_html_content(url).await?;
+        let document = Html::parse_document(&content);
+        Ok(document)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_get_page_count() -> Result<()> {
+        let avd = AVDCrawler::new();
+        let count = avd.get_page_count().await?;
+        assert!(count > 0);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_parse_page() -> Result<()> {
+        let avd = AVDCrawler::new();
+        let res = avd.parse_page(1).await?;
+        assert!(!res.is_empty());
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_get_detail_links() -> Result<()> {
+        let avd = AVDCrawler::new();
+        let page_url = format!("{}?page=1", avd.link);
+        let document = avd.get_document(&page_url).await?;
+        let detail_links = avd.get_detail_links(document)?;
+        assert_eq!(detail_links.len(), 30);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_parse_detail_page() -> Result<()> {
+        let avd = AVDCrawler::new();
+        let page_url = format!("{}?page=1", avd.link);
+        let document = avd.get_document(&page_url).await?;
+        let detail_links = avd.get_detail_links(document)?;
+        let first_link = &detail_links[0];
+        avd.parse_detail_page(first_link).await?;
+        Ok(())
     }
 }
