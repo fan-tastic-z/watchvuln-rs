@@ -10,6 +10,8 @@ use crate::utils::http_client::Help;
 
 use super::{Grab, Provider};
 
+const SEEBUG_LIST_URL: &str = "https://www.seebug.org/vuldb/vulnerabilities";
+
 pub struct SeeBugCrawler {
     pub name: String,
     pub display_name: String,
@@ -63,9 +65,7 @@ impl SeeBugCrawler {
     }
 
     pub async fn get_page_count(&self) -> Result<i32> {
-        let list_url = "https://www.seebug.org/vuldb/vulnerabilities";
-        let content = self.help.get_html_content(list_url).await?;
-        let document = Html::parse_document(&content);
+        let document = self.get_document(SEEBUG_LIST_URL).await?;
         let selector = Selector::parse("ul.pagination li a")
             .map_err(|err| eyre!("parse html error {}", err))?;
         let page_nums = document
@@ -82,9 +82,8 @@ impl SeeBugCrawler {
     }
 
     pub async fn parse_page(&self, page: i32) -> Result<Vec<VulnInfo>> {
-        let url = format!("https://www.seebug.org/vuldb/vulnerabilities?page={}", page);
-        let content = self.help.get_html_content(&url).await?;
-        let document = Html::parse_document(&content);
+        let url = format!("{}?page={}", SEEBUG_LIST_URL, page);
+        let document = self.get_document(&url).await?;
         let selector = Selector::parse(".sebug-table tbody tr")
             .map_err(|err| eyre!("parse html error {}", err))?;
         let tr_elements = document.select(&selector).collect::<Vec<_>>();
@@ -135,12 +134,8 @@ impl SeeBugCrawler {
                     continue;
                 }
             };
-            let severity = match severity_title.as_str() {
-                "低危" => Severity::Low,
-                "中危" => Severity::Medium,
-                "高危" => Severity::High,
-                _ => Severity::Low,
-            };
+
+            let severity = self.get_severity(&severity_title);
             let mut tags = Vec::new();
             if !tag.is_empty() {
                 tags.push(tag)
@@ -161,6 +156,21 @@ impl SeeBugCrawler {
             res.push(data);
         }
         Ok(res)
+    }
+
+    fn get_severity(&self, severity_title: &str) -> Severity {
+        match severity_title {
+            "低危" => Severity::Low,
+            "中危" => Severity::Medium,
+            "高危" => Severity::High,
+            _ => Severity::Low,
+        }
+    }
+
+    async fn get_document(&self, url: &str) -> Result<Html> {
+        let content = self.help.get_html_content(url).await?;
+        let document = Html::parse_document(&content);
+        Ok(document)
     }
 
     fn get_href(&self, el: ElementRef) -> Result<(String, String)> {
