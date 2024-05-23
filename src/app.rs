@@ -2,7 +2,7 @@ use sea_orm::DatabaseConnection;
 use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::{task::JoinSet, time};
 use tokio_cron_scheduler::{Job, JobScheduler};
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 
 use crate::{
     config::Config,
@@ -16,14 +16,22 @@ use crate::{
 
 const PAGE_LIMIT: i32 = 1;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct WatchVulnApp {
     pub app_context: Arc<AppContext>,
+    pub grabs: Arc<HashMap<String, Arc<Box<dyn Grab>>>>,
 }
 
 impl WatchVulnApp {
     pub fn new(app_context: Arc<AppContext>) -> Self {
-        WatchVulnApp { app_context }
+        let grab_manager = grab::init();
+        let map: HashMap<String, Arc<Box<dyn Grab>>> = grab_manager
+            .map
+            .into_iter()
+            .map(|(k, v)| (k, Arc::new(v)))
+            .collect();
+        let grabs = Arc::new(map);
+        WatchVulnApp { app_context, grabs }
     }
 
     pub async fn run(&self) -> Result<()> {
@@ -34,7 +42,7 @@ impl WatchVulnApp {
             let self_clone = self_arc.clone();
             Box::pin(async move {
                 let res = self_clone.crawling_task().await;
-                debug!("crawling over, result is : {:#?}", res);
+                info!("crawling over all count is: {}", res.len());
                 self_clone.push(res).await;
             })
         })?;
@@ -48,15 +56,9 @@ impl WatchVulnApp {
 
     async fn crawling_task(&self) -> Vec<Model> {
         tracing::info!("{:?}", self.app_context.config);
-        let grab_manager = grab::init();
-        let map: HashMap<String, Arc<Box<dyn Grab>>> = grab_manager
-            .map
-            .into_iter()
-            .map(|(k, v)| (k, Arc::new(v)))
-            .collect();
         let mut set = JoinSet::new();
-        for (_, v) in map.into_iter() {
-            let grab = v.clone();
+        for v in self.grabs.as_ref().values() {
+            let grab = v.to_owned();
             set.spawn(async move { grab.get_update(PAGE_LIMIT).await });
         }
         let mut new_vulns = Vec::new();
