@@ -22,6 +22,10 @@ const VULN_INFO_MSG_TEMPLATE: &str = r####"
 {% for reference in references %}{{ loop.index }}.{{ reference }}
 {% endfor %}{% endif %}"####;
 
+const INIT_MSG_TEMPLATE: &str = r#"
+数据初始化完成，当前版本 {{ version }} 本地漏洞数量: {{ vuln_count }} 检查周期配置： {{ cron_config }}
+"#;
+
 const MAX_REFERENCE_LENGTH: usize = 8;
 
 pub fn reader_vulninfo(mut vuln: VulnInfo) -> Result<String> {
@@ -54,6 +58,18 @@ fn escape_markdown(input: String) -> String {
         .replace('{', "\\{")
         .replace('}', "\\}")
         .replace('!', "\\!")
+}
+
+pub fn render_init(version: String, vuln_count: u64, cron_config: String) -> Result<String> {
+    let json_value = serde_json::json!(
+        {
+            "version": version,
+            "vuln_count": vuln_count,
+            "cron_config": cron_config,
+        }
+    );
+    let markdown = render_string(INIT_MSG_TEMPLATE, &json_value)?;
+    Ok(escape_markdown(markdown))
 }
 
 #[cfg(test)]

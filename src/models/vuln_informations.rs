@@ -1,7 +1,6 @@
 use sea_orm::{
-    ActiveModelTrait,
-    ActiveValue::{self},
-    ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, TransactionTrait,
+    ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, PaginatorTrait,
+    QueryFilter, TransactionTrait,
 };
 use tracing::info;
 
@@ -20,6 +19,11 @@ impl super::_entities::vuln_informations::Model {
             .one(db)
             .await?;
         vuln.ok_or_else(|| ModelError::EntityNotFound)
+    }
+
+    pub async fn query_count(db: &DatabaseConnection) -> ModelResult<u64> {
+        let count = vuln_informations::Entity::find().count(db).await?;
+        Ok(count)
     }
 
     pub async fn creat_or_update(db: &DatabaseConnection, mut vuln: VulnInfo) -> ModelResult<Self> {

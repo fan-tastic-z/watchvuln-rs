@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
-use tracing::info;
 
 use super::{Grab, Provider, Severity, VulnInfo};
 use crate::error::Result;
@@ -69,10 +68,6 @@ impl TiCrawler {
 
     pub async fn get_vuln_infos(&self) -> Result<Vec<VulnInfo>> {
         let ti_one_day_resp = self.get_ti_one_day_resp().await?;
-        info!(
-            "key_vuln_add len is {}",
-            ti_one_day_resp.data.key_vuln_add.len()
-        );
         let mut vuln_infos = Vec::with_capacity(ti_one_day_resp.data.key_vuln_add.len());
         for detail in ti_one_day_resp.data.key_vuln_add {
             let tags = self.get_tags(detail.tag);

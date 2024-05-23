@@ -12,6 +12,10 @@ pub enum Error {
         backtrace: Box<std::backtrace::Backtrace>,
     },
 
+    // Model
+    #[error(transparent)]
+    Model(#[from] crate::models::ModelError),
+
     #[error("{0}")]
     Message(String),
 

@@ -13,8 +13,8 @@ database:
   max_connections: 1
 
 task:
-  # every day 7:00-22:00 interval 1 minute Execute task
-  cron_config: "0 */1 2-23 * * *"
+  # every day 7:00-22:00 interval 30 minute Execute task
+  cron_config: "0 */30 7-21 * * *"
 
 # Application logging configuration
 logger:

@@ -1,3 +1,4 @@
+use lazy_static::lazy_static;
 use sea_orm::DatabaseConnection;
 use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::{task::JoinSet, time};
@@ -11,10 +12,18 @@ use crate::{
     error::Result,
     grab::{self, Grab, Severity},
     models::_entities::vuln_informations::{self, Model},
-    push::{msg_template::reader_vulninfo, telegram::Telegram},
+    push::{
+        msg_template::{reader_vulninfo, render_init},
+        telegram::Telegram,
+    },
 };
 
+lazy_static! {
+    static ref VERSION: &'static str = env!("CARGO_PKG_VERSION");
+}
+
 const PAGE_LIMIT: i32 = 1;
+const INIT_PAGE_LIMIT: i32 = 2;
 
 #[derive(Clone)]
 pub struct WatchVulnApp {
@@ -36,12 +45,19 @@ impl WatchVulnApp {
 
     pub async fn run(&self) -> Result<()> {
         let self_arc = Arc::new(self.clone());
+
+        // init data
+        self_arc.crawling_task(true).await;
+        let local_count = vuln_informations::Model::query_count(&self.app_context.db).await?;
+        info!("init finished, local database has {} vulns", local_count);
+        self.push_init_msg(local_count).await?;
+
         let sched = JobScheduler::new().await?;
         let schedule = self.app_context.config.task.cron_config.as_str();
         let job = Job::new_async(schedule, move |_uuid, _lock| {
             let self_clone = self_arc.clone();
             Box::pin(async move {
-                let res = self_clone.crawling_task().await;
+                let res = self_clone.crawling_task(false).await;
                 info!("crawling over all count is: {}", res.len());
                 self_clone.push(res).await;
             })
@@ -54,12 +70,16 @@ impl WatchVulnApp {
         }
     }
 
-    async fn crawling_task(&self) -> Vec<Model> {
+    async fn crawling_task(&self, is_init: bool) -> Vec<Model> {
         tracing::info!("{:?}", self.app_context.config);
         let mut set = JoinSet::new();
         for v in self.grabs.as_ref().values() {
             let grab = v.to_owned();
-            set.spawn(async move { grab.get_update(PAGE_LIMIT).await });
+            if is_init {
+                set.spawn(async move { grab.get_update(INIT_PAGE_LIMIT).await });
+            } else {
+                set.spawn(async move { grab.get_update(PAGE_LIMIT).await });
+            }
         }
         let mut new_vulns = Vec::new();
         while let Some(set_res) = set.join_next().await {
@@ -116,6 +136,16 @@ impl WatchVulnApp {
                 }
             }
         }
+    }
+
+    async fn push_init_msg(&self, local_count: u64) -> Result<()> {
+        let init_msg = render_init(
+            VERSION.to_string(),
+            local_count,
+            self.app_context.config.task.cron_config.clone(),
+        )?;
+        self.app_context.tg_bot.push_markdown(init_msg).await?;
+        Ok(())
     }
 }
 
