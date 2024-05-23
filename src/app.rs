@@ -8,10 +8,10 @@ use crate::{
     config::Config,
     db,
     environment::Environment,
+    error::Result,
     grab::{self, Grab, Severity},
     models::_entities::vuln_informations::{self, Model},
     push::{msg_template::reader_vulninfo, telegram::Telegram},
-    Result,
 };
 
 const PAGE_LIMIT: i32 = 1;

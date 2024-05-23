@@ -1,6 +1,11 @@
 use std::path::{Path, PathBuf};
 
-use crate::{environment::Environment, logger, utils::render_string, Error, Result};
+use crate::{
+    environment::Environment,
+    error::{Error, Result},
+    logger,
+    utils::render_string,
+};
 use fs_err as fs;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};

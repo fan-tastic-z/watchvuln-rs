@@ -6,9 +6,9 @@ use scraper::{Html, Selector};
 use tracing::{debug, warn};
 
 use crate::{
+    error::{Error, Result},
     grab::{Severity, VulnInfo},
     utils::http_client::Help,
-    Error, Result,
 };
 
 use super::{Grab, Provider};

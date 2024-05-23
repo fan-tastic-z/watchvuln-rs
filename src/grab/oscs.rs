@@ -5,9 +5,9 @@ use serde::{Deserialize, Serialize};
 use tracing::error;
 
 use crate::{
+    error::{Error, Result},
     grab::{Severity, VulnInfo},
     utils::{http_client::Help, timestamp_to_date},
-    Error, Result,
 };
 
 use super::{Grab, Provider};

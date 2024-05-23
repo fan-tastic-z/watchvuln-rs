@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 use tracing::info;
 
 use super::{Grab, Provider, Severity, VulnInfo};
+use crate::error::Result;
 use crate::utils::http_client::Help;
-use crate::Result;
 
 const ONE_URL: &str = "https://ti.qianxin.com/alpha-api/v2/vuln/one-day";
 
@@ -147,7 +147,7 @@ pub struct TiVulnDetail {
     pub qvd_code: String,
     pub cve_code: String,
     pub cnvd_id: Option<String>,
-    pub cnnvd_id: String,
+    pub cnnvd_id: Option<String>,
     pub threat_category: String,
     pub technical_category: String,
     pub residence_id: Option<i32>,

@@ -1,4 +1,4 @@
-use crate::Result;
+use crate::error::Result;
 use reqwest::header::{self, HeaderMap};
 
 #[derive(Debug, Clone)]

@@ -6,7 +6,7 @@ use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
 
 use super::{Grab, Provider, VulnInfo};
-use crate::Result;
+use crate::error::Result;
 use crate::{grab::Severity, utils::http_client::Help};
 
 const KEV_URL: &str =

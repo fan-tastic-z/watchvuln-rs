@@ -8,8 +8,3 @@ pub mod logger;
 pub mod models;
 pub mod push;
 pub mod utils;
-
-pub use error::Error;
-
-pub use app::WatchVulnApp;
-pub use error::Result;

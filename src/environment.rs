@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use serde_variant::to_variant_name;
 
 use crate::config::Config;
-use crate::Result;
+use crate::error::Result;
 
 pub const DEFAULT_ENVIRONMENT: &str = "development";
 

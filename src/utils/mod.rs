@@ -1,6 +1,6 @@
 pub mod http_client;
 
-use crate::{Error, Result};
+use crate::error::{Error, Result};
 use chrono::DateTime;
 use tera::{Context, Tera};
 

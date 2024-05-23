@@ -1,6 +1,6 @@
+use crate::error::Result;
 use crate::grab::VulnInfo;
 use crate::utils::render_string;
-use crate::Result;
 use serde_json::Value;
 
 const VULN_INFO_MSG_TEMPLATE: &str = r####"

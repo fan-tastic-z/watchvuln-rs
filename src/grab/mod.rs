@@ -6,7 +6,7 @@ pub mod ti;
 
 use std::{collections::HashMap, fmt};
 
-use crate::{models::_entities::vuln_informations::Model, Result};
+use crate::{error::Result, models::_entities::vuln_informations::Model};
 use async_trait::async_trait;
 pub use avd::AVDCrawler;
 use serde::{Deserialize, Serialize};

@@ -4,9 +4,9 @@ use reqwest::header::{self};
 use scraper::{ElementRef, Html, Selector};
 use tracing::warn;
 
+use crate::error::{Error, Result};
 use crate::grab::{Severity, VulnInfo};
 use crate::utils::http_client::Help;
-use crate::{Error, Result};
 
 use super::{Grab, Provider};
 

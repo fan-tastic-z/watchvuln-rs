@@ -1,4 +1,4 @@
-use crate::Result;
+use crate::error::Result;
 use teloxide::{prelude::*, types::ParseMode};
 
 #[derive(Debug, Clone)]
