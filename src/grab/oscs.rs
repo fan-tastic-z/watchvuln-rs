@@ -13,6 +13,10 @@ use crate::{
 use super::{Grab, Provider};
 
 const OSCS_PAGE_SIZE: i32 = 10;
+const OSCS_PAGE_DEFAULT: i32 = 1;
+const OSCS_PER_PAGE_DEFAULT: i32 = 10;
+const OSCS_LIST_URL: &str = "https://www.oscs1024.com/oscs/v1/intelligence/list";
+const OSCS_DETAIL_URL: &str = "https://www.oscs1024.com/oscs/v1/vdb/info";
 
 pub struct OscCrawler {
     pub name: String,
@@ -66,14 +70,24 @@ impl OscCrawler {
         }
     }
 
-    pub async fn get_page_count(&self) -> Result<i32> {
-        let list_url = "https://www.oscs1024.com/oscs/v1/intelligence/list";
+    pub async fn get_list_resp(&self, page: i32, per_page: i32) -> Result<OscsListResp> {
         let params = serde_json::json!({
-            "page": 1,
-            "per_page": 10,
+            "page": page,
+            "per_page": per_page,
         });
-        let oscs_list_resp: OscsListResp =
-            self.help.post_json(list_url, &params).await?.json().await?;
+        let oscs_list_resp: OscsListResp = self
+            .help
+            .post_json(OSCS_LIST_URL, &params)
+            .await?
+            .json()
+            .await?;
+        Ok(oscs_list_resp)
+    }
+
+    pub async fn get_page_count(&self) -> Result<i32> {
+        let oscs_list_resp = self
+            .get_list_resp(OSCS_PAGE_DEFAULT, OSCS_PER_PAGE_DEFAULT)
+            .await?;
         let total = oscs_list_resp.data.total;
         if total <= 0 {
             return Err(Error::Message("oscs get total error".to_owned()));
@@ -89,26 +103,15 @@ impl OscCrawler {
     }
 
     pub async fn parse_page(&self, page: i32) -> Result<Vec<VulnInfo>> {
-        let list_url = "https://www.oscs1024.com/oscs/v1/intelligence/list";
-        let params = serde_json::json!({
-            "page": page,
-            "per_page": OSCS_PAGE_SIZE,
-        });
-        let oscs_list_resp: OscsListResp =
-            self.help.post_json(list_url, &params).await?.json().await?;
+        let oscs_list_resp = self.get_list_resp(page, OSCS_PAGE_SIZE).await?;
         let mut res = Vec::with_capacity(oscs_list_resp.data.data.len());
         for item in oscs_list_resp.data.data {
             let mut tags = Vec::new();
             if item.is_push == 1 {
                 tags.push("发布预警".to_string());
             }
-            let event_type = match item.intelligence_type {
-                1 => "公开漏洞",
-                2 => "墨菲安全独家",
-                3 => "投毒情报",
-                _ => "公开漏洞",
-            };
-            tags.push(event_type.to_string());
+            let event_type = self.get_event_type(item.intelligence_type);
+            tags.push(event_type);
 
             let vuln_info = self.parse_detail(&item.mps).await;
             match vuln_info {
@@ -122,32 +125,16 @@ impl OscCrawler {
                 }
             }
         }
-
         Ok(res)
     }
 
     pub async fn parse_detail(&self, mps: &str) -> Result<VulnInfo> {
-        let detail_url = "https://www.oscs1024.com/oscs/v1/vdb/info";
-        let params = serde_json::json!({
-            "vuln_no": mps,
-        });
-        let detail: OscsDetailResp = self
-            .help
-            .post_json(detail_url, &params)
-            .await?
-            .json()
-            .await?;
+        let detail = self.get_detail_resp(mps).await?;
         if detail.code != 200 || !detail.success || detail.data.is_empty() {
             return Err(Error::Message(format!("oscs get: {} detail error", mps)));
         };
         let data = detail.data[0].clone();
-        let severity = match data.level.as_str() {
-            "Critical" => Severity::Critical,
-            "High" => Severity::High,
-            "Medium" => Severity::Medium,
-            "Low" => Severity::Low,
-            _ => Severity::Low,
-        };
+        let severity = self.get_severity(&data.level);
         let disclosure = timestamp_to_date(data.publish_time)?;
         let references = data
             .references
@@ -180,6 +167,38 @@ impl OscCrawler {
             .map(|(index, item)| format!("{}.{}.\n", index + 1, item))
             .collect::<Vec<_>>()
             .join("")
+    }
+
+    fn get_event_type(&self, intelligence_type: i32) -> String {
+        match intelligence_type {
+            1 => "公开漏洞".to_string(),
+            2 => "墨菲安全独家".to_string(),
+            3 => "投毒情报".to_string(),
+            _ => "公开漏洞".to_string(),
+        }
+    }
+
+    async fn get_detail_resp(&self, mps: &str) -> Result<OscsDetailResp> {
+        let params = serde_json::json!({
+            "vuln_no": mps,
+        });
+        let detail: OscsDetailResp = self
+            .help
+            .post_json(OSCS_DETAIL_URL, &params)
+            .await?
+            .json()
+            .await?;
+        Ok(detail)
+    }
+
+    fn get_severity(&self, level: &str) -> Severity {
+        match level {
+            "Critical" => Severity::Critical,
+            "High" => Severity::High,
+            "Medium" => Severity::Medium,
+            "Low" => Severity::Low,
+            _ => Severity::Low,
+        }
     }
 }
 
@@ -280,4 +299,29 @@ pub struct Solutions {
 pub struct References {
     pub name: String,
     pub url: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_get_page_count() -> Result<()> {
+        let oscs = OscCrawler::new();
+        let count = oscs.get_page_count().await?;
+        assert!(count > 0);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_get_list_resp() -> Result<()> {
+        let oscs = OscCrawler::new();
+        let res = oscs
+            .get_list_resp(OSCS_PAGE_DEFAULT, OSCS_PER_PAGE_DEFAULT)
+            .await?;
+        assert!(res.success);
+        assert_eq!(res.code, 200);
+        assert_eq!(res.data.data.len(), 10);
+        Ok(())
+    }
 }
