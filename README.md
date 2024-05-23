@@ -27,6 +27,12 @@
 sea-orm-cli migrate up
 ```
 
+本地测试：
+
+```bash
+RUST_LOG=info TG_CHAT_ID=xxx TG_TOKEN=xxx cargo run
+```
+
 ## telegram 推送效果
 
 ![app](./assets/app.jpg)
