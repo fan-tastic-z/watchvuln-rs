@@ -42,7 +42,7 @@ chrono = { version = "0.4", features = ["serde"] }
 
 async-trait = "0.1.74"
 
-sea-orm = { version = "1.0.0-rc.3", features = [
+sea-orm = { version = "1.0.0-rc.4", features = [
     "sqlx-postgres",
     "runtime-tokio-rustls",
     "macros",
