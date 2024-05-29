@@ -12,10 +12,7 @@
 | OSCS开源安全情报预警 | <https://www.oscs1024.com/cm>                                  | 等级为高危或严重**并且**包含 `预警` 标签                                     |
 | 知道创宇Seebug漏洞库 | <https://www.seebug.org/>                                      | 等级为高危或严重                                                             |
 | CISA KEV             | <https://www.cisa.gov/known-exploited-vulnerabilities-catalog> | 全部推送                                                                     |
-| 奇安信威胁情报中心   | <https://ti.qianxin.com/>                                        | 等级为高危严重**并且**包含 `奇安信CERT验证` `POC公开` `技术细节公布`标签之一 |
-
-
-目前程序支持telegram群消息推送
+| 奇安信威胁情报中心   | <https://ti.qianxin.com/>                                      | 等级为高危严重**并且**包含 `奇安信CERT验证` `POC公开` `技术细节公布`标签之一 |
 
 ## 开发
 
@@ -33,7 +30,12 @@ sea-orm-cli migrate up
 RUST_LOG=info TG_CHAT_ID=xxx TG_TOKEN=xxx cargo run
 ```
 
-## telegram 推送效果
+## 支持推送方式
+
+- 钉钉机器人
+- Telegram机器人
+
+## 推送效果
 
 ![app](./assets/app.jpg)
 
