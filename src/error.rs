@@ -1,5 +1,6 @@
 use std::num::ParseIntError;
 
+use hmac::digest::crypto_common;
 use migration::sea_orm;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
@@ -18,6 +19,9 @@ pub enum Error {
 
     #[error("{0}")]
     Message(String),
+
+    #[error(transparent)]
+    HmacError(#[from] crypto_common::InvalidLength),
 
     #[error(transparent)]
     CronScheduler(#[from] tokio_cron_scheduler::JobSchedulerError),

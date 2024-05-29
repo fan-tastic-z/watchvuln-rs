@@ -2,6 +2,8 @@ pub mod http_client;
 
 use crate::error::{Error, Result};
 use chrono::DateTime;
+use hmac::{Hmac, Mac};
+use sha2::Sha256;
 use tera::{Context, Tera};
 
 pub fn timestamp_to_date(timestamp: i64) -> Result<String> {
@@ -15,6 +17,12 @@ pub fn timestamp_to_date(timestamp: i64) -> Result<String> {
 pub fn render_string(tera_template: &str, locals: &serde_json::Value) -> Result<String> {
     let text = Tera::one_off(tera_template, &Context::from_serialize(locals)?, false)?;
     Ok(text)
+}
+
+pub fn calc_hmac_sha256(key: &[u8], message: &[u8]) -> Result<Vec<u8>> {
+    let mut mac = Hmac::<Sha256>::new_from_slice(key)?;
+    mac.update(message);
+    Ok(mac.finalize().into_bytes().to_vec())
 }
 
 #[cfg(test)]

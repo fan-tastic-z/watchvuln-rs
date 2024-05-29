@@ -13,8 +13,9 @@ use crate::{
     grab::{self, Grab, Severity},
     models::_entities::vuln_informations::{self, Model},
     push::{
+        self,
         msg_template::{reader_vulninfo, render_init},
-        telegram::Telegram,
+        BotManager,
     },
 };
 
@@ -119,6 +120,7 @@ impl WatchVulnApp {
                     continue;
                 }
                 let key = vuln.key.clone();
+                let title = vuln.title.clone();
                 let msg = match reader_vulninfo(vuln.into()) {
                     Ok(msg) => msg,
                     Err(err) => {
@@ -126,13 +128,15 @@ impl WatchVulnApp {
                         continue;
                     }
                 };
-                if let Err(err) = self.app_context.tg_bot.push_markdown(msg.clone()).await {
-                    warn!("push vuln {} msg {} error: {}", key, msg, err);
-                };
-                if let Err(err) =
-                    vuln_informations::Model::update_pushed_by_key(&self.app_context.db, key).await
-                {
-                    warn!("update vuln {} pushed error: {}", msg, err);
+                let is_push = self.push_all(title, msg.clone()).await;
+                if is_push {
+                    info!("all bot push success update db will pushed true");
+                    if let Err(err) =
+                        vuln_informations::Model::update_pushed_by_key(&self.app_context.db, key)
+                            .await
+                    {
+                        warn!("update vuln {} pushed error: {}", msg, err);
+                    }
                 }
             }
         }
@@ -144,27 +148,55 @@ impl WatchVulnApp {
             local_count,
             self.app_context.config.task.cron_config.clone(),
         )?;
-        self.app_context.tg_bot.push_markdown(init_msg).await?;
+
+        self.push_all("WatchVuln-rs init success".to_string(), init_msg)
+            .await;
         Ok(())
+    }
+
+    pub async fn push_all(&self, title: String, msg: String) -> bool {
+        let mut set = JoinSet::new();
+        for bot in &self.app_context.bot_manager.bots {
+            let bot_clone = bot.clone();
+            let message = msg.clone();
+            let title = title.clone();
+            set.spawn(async move { bot_clone.push_markdown(title, message).await });
+        }
+        let mut is_push = true;
+        while let Some(set_res) = set.join_next().await {
+            match set_res {
+                Ok(res) => {
+                    if let Err(e) = res {
+                        is_push = false;
+                        warn!("push message error:{}", e);
+                    }
+                }
+                Err(err) => {
+                    is_push = false;
+                    warn!("push join set error:{}", err)
+                }
+            }
+        }
+        is_push
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct AppContext {
     pub environment: Environment,
     pub config: Config,
     pub db: DatabaseConnection,
-    pub tg_bot: Telegram,
+    pub bot_manager: BotManager,
 }
 
 pub async fn create_context(environment: &Environment) -> Result<AppContext> {
     let config = environment.load()?;
     let db = db::connect(&config.database).await?;
-    let tg_bot = Telegram::new(config.tg_bot.token.clone(), config.tg_bot.chat_id);
+    let bot_manager = push::init(config.clone());
     Ok(AppContext {
         environment: environment.clone(),
         config,
         db,
-        tg_bot,
+        bot_manager,
     })
 }

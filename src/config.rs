@@ -21,6 +21,7 @@ pub struct Config {
     pub task: Task,
     pub logger: Logger,
     pub tg_bot: TgBot,
+    pub ding_bot: DingBot,
 }
 
 impl Config {
@@ -100,4 +101,10 @@ pub struct Logger {
 pub struct TgBot {
     pub chat_id: i64,
     pub token: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+pub struct DingBot {
+    pub access_token: String,
+    pub secret_token: String,
 }

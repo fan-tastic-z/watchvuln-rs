@@ -5,6 +5,7 @@ use serde_json::Value;
 
 const VULN_INFO_MSG_TEMPLATE: &str = r####"
 # {{ title }}
+
 - CVE编号: {% if cve %} {{ cve }}{% else %}暂无 {% endif %}
 - 危害定级: **{{ severity }}**
 - 漏洞标签: {% for tag in tags %}**{{ tag }}**{% endfor %}
@@ -32,13 +33,12 @@ pub fn reader_vulninfo(mut vuln: VulnInfo) -> Result<String> {
     if vuln.references.len() > MAX_REFERENCE_LENGTH {
         vuln.references = vuln.references[..MAX_REFERENCE_LENGTH].to_vec();
     }
-
     let json_value: Value = serde_json::to_value(vuln)?;
     let markdown = render_string(VULN_INFO_MSG_TEMPLATE, &json_value)?;
-    Ok(escape_markdown(markdown))
+    Ok(markdown)
 }
 
-fn escape_markdown(input: String) -> String {
+pub fn escape_markdown(input: String) -> String {
     input
         .replace('_', "\\_")
         .replace('.', "\\.")
@@ -69,7 +69,7 @@ pub fn render_init(version: String, vuln_count: u64, cron_config: String) -> Res
         }
     );
     let markdown = render_string(INIT_MSG_TEMPLATE, &json_value)?;
-    Ok(escape_markdown(markdown))
+    Ok(markdown)
 }
 
 #[cfg(test)]

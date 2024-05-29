@@ -14,7 +14,7 @@ database:
 
 task:
   # every day 7:00-22:00 interval 30 minute Execute task
-  cron_config: "0 */30 7-21 * * *"
+  cron_config: "0 */1 7-21 * * *"
 
 # Application logging configuration
 logger:
@@ -34,3 +34,7 @@ logger:
 tg_bot:
   chat_id: {{ get_env(name="TG_CHAT_ID", default=0) }}
   token: {{ get_env(name="TG_TOKEN", default="") }}
+
+ding_bot:
+  access_token: {{ get_env(name="DING_ACCESS_TOKEN", default="") }}
+  secret_token: {{ get_env(name="DING_SECRET_TOKEN", default="") }}
