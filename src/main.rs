@@ -11,6 +11,7 @@ async fn main() -> Result<()> {
     let app_context = Arc::new(create_context(&environment).await?);
     logger::init(&app_context.config.logger);
     let app = WatchVulnApp::new(app_context);
+    app.run_migration().await?;
     app.run().await?;
     Ok(())
 }

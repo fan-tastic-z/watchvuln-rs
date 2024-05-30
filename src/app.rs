@@ -1,4 +1,5 @@
 use lazy_static::lazy_static;
+use migration::MigratorTrait;
 use sea_orm::DatabaseConnection;
 use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::{task::JoinSet, time};
@@ -178,6 +179,11 @@ impl WatchVulnApp {
             }
         }
         is_push
+    }
+
+    pub async fn run_migration(&self) -> Result<()> {
+        migration::Migrator::up(&self.app_context.db, None).await?;
+        Ok(())
     }
 }
 
