@@ -2,7 +2,12 @@
 
 
 [files]
-extend-exclude = ["CHANGELOG.md", "notebooks/*", "config/development.yaml"]
+extend-exclude = [
+    "CHANGELOG.md",
+    "notebooks/*",
+    "config/development.yaml",
+    "migration",
+]
 
 [default.extend-identifiers]
 vuln_informations = "vuln_informations"

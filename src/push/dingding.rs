@@ -36,7 +36,7 @@ impl MessageBot for DingDing {
         });
 
         let sign = self.generate_sign()?;
-        println!("{:?}", self);
+
         let res: DingResponse = help
             .http_client
             .post(DING_API_URL)
@@ -46,7 +46,7 @@ impl MessageBot for DingDing {
             .await?
             .json()
             .await?;
-        println!("{:?}", res);
+
         if res.errcode != 0 {
             warn!(
                 "ding push markdown message error, err msg is {}",

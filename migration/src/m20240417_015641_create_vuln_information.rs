@@ -64,6 +64,7 @@ impl MigrationTrait for Migration {
     }
 }
 
+#[allow(clippy::upper_case_acronyms)]
 #[derive(DeriveIden)]
 enum VulnInformations {
     Table,
