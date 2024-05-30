@@ -56,14 +56,26 @@ impl WatchVulnApp {
 
         let sched = JobScheduler::new().await?;
         let schedule = self.app_context.config.task.cron_config.as_str();
-        let job = Job::new_async(schedule, move |_uuid, _lock| {
-            let self_clone = self_arc.clone();
-            Box::pin(async move {
-                let res = self_clone.crawling_task(false).await;
-                info!("crawling over all count is: {}", res.len());
-                self_clone.push(res).await;
-            })
-        })?;
+
+        let job = Job::new_async_tz(
+            schedule,
+            chrono_tz::Asia::Shanghai,
+            move |uuid, mut lock| {
+                let self_clone = self_arc.clone();
+                Box::pin(async move {
+                    let res = self_clone.crawling_task(false).await;
+                    info!("crawling over all count is: {}", res.len());
+                    self_clone.push(res).await;
+                    let next_tick = lock.next_tick_for_job(uuid).await;
+                    if let Ok(Some(tick)) = next_tick {
+                        info!(
+                            "Next time for job is: {}",
+                            tick.with_timezone(&chrono_tz::Asia::Shanghai)
+                        );
+                    }
+                })
+            },
+        )?;
 
         sched.add(job).await?;
         sched.start().await?;
