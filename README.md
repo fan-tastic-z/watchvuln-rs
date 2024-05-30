@@ -2,8 +2,6 @@
 
 ## 介绍
 
-程序还在持续完善功能
-
 当前抓取了这几个站点的数据:
 
 | 名称                 | 地址                                                           | 推送策略                                                                     |
@@ -29,6 +27,22 @@ sea-orm-cli migrate up
 ```bash
 RUST_LOG=info TG_CHAT_ID=xxx TG_TOKEN=xxx cargo run
 ```
+
+## 部署
+
+项目已经配置了docker-compose,可以通过deployment目录下的文件一键部署
+
+deployment/env 关键配置
+
+```env
+DATABASE_URL=postgres://watchvuln:watchvuln@db:5432/watchvuln
+DING_ACCESS_TOKEN=
+DING_SECRET_TOKEN=
+TG_CHAT_ID=0
+TG_TOKEN=
+```
+
+根据自己的使用添加钉钉或者telegram机器人的配置
 
 ## 支持推送方式
 
