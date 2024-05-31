@@ -38,6 +38,8 @@ impl Grab for KevCrawler {
             if !vuln.notes.is_empty() {
                 references.push(vuln.notes.to_string())
             }
+            let is_valuable = true;
+
             let vuln_info = VulnInfo {
                 unique_key: format!("{}_KEV", vuln.cve_id),
                 title: vuln.vulnerability_name.to_string(),
@@ -54,6 +56,7 @@ impl Grab for KevCrawler {
                     "在野利用".to_string(),
                 ],
                 reasons: vec![],
+                is_valuable,
             };
             res.push(vuln_info)
         }

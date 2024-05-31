@@ -66,6 +66,9 @@ pub enum Error {
     IO(#[from] std::io::Error),
 
     #[error(transparent)]
+    DataParse(#[from] chrono::ParseError),
+
+    #[error(transparent)]
     Any(#[from] Box<dyn std::error::Error + Send + Sync>),
 
     #[error(transparent)]

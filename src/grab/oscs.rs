@@ -143,6 +143,7 @@ impl OscCrawler {
             .collect::<Vec<_>>();
 
         let solutions = self.get_solutions(data.soulution_data);
+        let is_valuable = severity == Severity::High || severity == Severity::Critical;
 
         let data = VulnInfo {
             unique_key: data.vuln_no,
@@ -156,6 +157,7 @@ impl OscCrawler {
             from: self.link.clone(),
             tags: vec![],
             reasons: vec![],
+            is_valuable,
         };
         Ok(data)
     }

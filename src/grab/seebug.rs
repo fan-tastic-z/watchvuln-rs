@@ -140,6 +140,8 @@ impl SeeBugCrawler {
             if !tag.is_empty() {
                 tags.push(tag)
             }
+            let is_valuable = severity == Severity::High || severity == Severity::Critical;
+
             let data = VulnInfo {
                 unique_key,
                 title,
@@ -152,6 +154,7 @@ impl SeeBugCrawler {
                 from: href,
                 tags,
                 reasons: vec![],
+                is_valuable,
             };
             res.push(data);
         }

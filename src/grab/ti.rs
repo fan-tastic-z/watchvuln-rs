@@ -72,6 +72,8 @@ impl TiCrawler {
         for detail in ti_one_day_resp.data.key_vuln_add {
             let tags = self.get_tags(detail.tag);
             let severity = self.get_severity(detail.rating_level);
+            let is_valuable = severity == Severity::High || severity == Severity::Critical;
+
             let vuln_info = VulnInfo {
                 unique_key: detail.qvd_code,
                 title: detail.vuln_name,
@@ -84,6 +86,7 @@ impl TiCrawler {
                 from: format!("https://ti.qianxin.com/vulnerability/detail/{}", detail.id),
                 tags,
                 reasons: vec![],
+                is_valuable,
             };
             if vuln_infos
                 .iter()

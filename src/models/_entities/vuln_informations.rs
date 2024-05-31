@@ -23,6 +23,7 @@ pub struct Model {
     pub reasons: Option<Vec<String>>,
     pub from: String,
     pub pushed: bool,
+    pub is_valuable: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

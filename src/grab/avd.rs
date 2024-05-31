@@ -143,6 +143,7 @@ impl AVDCrawler {
         let solutions = self.get_solutions(&document)?;
 
         let references = self.get_references(&document)?;
+        let is_valuable = severity == Severity::High || severity == Severity::Critical;
 
         let data = VulnInfo {
             unique_key: avd_id,
@@ -156,6 +157,7 @@ impl AVDCrawler {
             from: self.link.clone(),
             tags,
             reasons: vec![],
+            is_valuable,
         };
         Ok(data)
     }

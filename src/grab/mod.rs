@@ -2,6 +2,7 @@ pub mod avd;
 pub mod kev;
 pub mod oscs;
 pub mod seebug;
+pub mod threatbook;
 pub mod ti;
 
 use std::{collections::HashMap, fmt};
@@ -10,6 +11,7 @@ use crate::{error::Result, models::_entities::vuln_informations::Model};
 use async_trait::async_trait;
 pub use avd::AVDCrawler;
 use serde::{Deserialize, Serialize};
+use threatbook::ThreadBookCrawler;
 
 use self::{kev::KevCrawler, oscs::OscCrawler, seebug::SeeBugCrawler, ti::TiCrawler};
 
@@ -26,6 +28,7 @@ pub struct VulnInfo {
     pub from: String,
     pub tags: Vec<String>,
     pub reasons: Vec<String>,
+    pub is_valuable: bool,
 }
 
 impl From<Model> for VulnInfo {
@@ -65,6 +68,7 @@ impl From<Model> for VulnInfo {
             from: v.from,
             tags,
             reasons,
+            is_valuable: v.is_valuable,
         }
     }
 }
@@ -123,5 +127,6 @@ pub fn init() -> GrabManager {
     manager.register(Box::new(SeeBugCrawler::new()));
     manager.register(Box::new(KevCrawler::new()));
     manager.register(Box::new(TiCrawler::new()));
+    manager.register(Box::new(ThreadBookCrawler::new()));
     manager
 }

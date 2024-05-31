@@ -11,7 +11,7 @@ use crate::{
     db,
     environment::Environment,
     error::Result,
-    grab::{self, Grab, Severity},
+    grab::{self, Grab},
     models::_entities::vuln_informations::{self, Model},
     push::{
         self,
@@ -125,9 +125,7 @@ impl WatchVulnApp {
 
     async fn push(&self, vulns: Vec<Model>) {
         for vuln in vulns.into_iter() {
-            if vuln.severtiy == Severity::Critical.to_string()
-                || vuln.severtiy == Severity::Critical.to_string()
-            {
+            if vuln.is_valuable {
                 if vuln.pushed {
                     info!("{} has been pushed, skipped", vuln.key);
                     continue;

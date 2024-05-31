@@ -98,6 +98,7 @@ mod tests {
             from: "https://avd.aliyun.com/high-risk/list".to_string(),
             tags,
             reasons,
+            is_valuable: false,
         };
         let res = reader_vulninfo(v)?;
         println!("{}", res);

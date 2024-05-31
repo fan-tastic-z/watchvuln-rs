@@ -1,10 +1,20 @@
 pub mod http_client;
 
 use crate::error::{Error, Result};
-use chrono::DateTime;
+use chrono::{DateTime, Duration, NaiveDate, Utc};
 use hmac::{Hmac, Mac};
 use sha2::Sha256;
 use tera::{Context, Tera};
+
+pub fn check_over_two_week(date: &str) -> Result<bool> {
+    let target_date = NaiveDate::parse_from_str(date, "%Y-%m-%d")?;
+    let now = Utc::now().naive_utc().date();
+    let two_weeks_ago = now - Duration::weeks(2);
+    if target_date >= two_weeks_ago && target_date <= now {
+        return Ok(true);
+    }
+    Ok(false)
+}
 
 pub fn timestamp_to_date(timestamp: i64) -> Result<String> {
     let dt = DateTime::from_timestamp_millis(timestamp);
