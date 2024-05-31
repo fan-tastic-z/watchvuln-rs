@@ -2,15 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.1.1] - 2024-05-31
+
+### 🚀 Features
+
+- JobScheduler use shanghai tz
+- Support crawling threatbook data
 
 ### 📚 Documentation
 
 - Readme add deployment content
+- Readme add threatbook
 
 ### ⚙️ Miscellaneous Tasks
 
 - Update cliff config
+- Config cliff config and generate CHANGELOG
+- Delete vscode settings
+- Update default config and app.env add RUST_LOG=info
+- Add docker build and push
+- Update version 0.1.1
 
 ## [0.1.0] - 2024-05-30
 
