@@ -9,7 +9,7 @@ use crate::{
     utils::{check_over_two_week, http_client::Help},
 };
 
-use super::{Grab, Provider, VulnInfo};
+use super::{Grab, VulnInfo};
 
 const HOME_PAGE_URL: &str = "https://x.threatbook.com/v5/node/vul_module/homePage";
 const LINK: &str = "https://x.threatbook.com/v5/vulIntelligence";
@@ -73,14 +73,6 @@ impl Grab for ThreadBookCrawler {
             res.push(vuln);
         }
         Ok(res)
-    }
-
-    fn get_provider(&self) -> Provider {
-        Provider {
-            name: self.name.to_owned(),
-            display_name: self.display_name.to_owned(),
-            link: self.link.to_owned(),
-        }
     }
 
     fn get_name(&self) -> String {

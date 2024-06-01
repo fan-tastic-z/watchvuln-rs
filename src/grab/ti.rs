@@ -2,12 +2,13 @@ use async_trait::async_trait;
 use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
 
-use super::{Grab, Provider, Severity, VulnInfo};
+use super::{Grab, Severity, VulnInfo};
 use crate::error::Result;
 use crate::utils::http_client::Help;
 
 const ONE_URL: &str = "https://ti.qianxin.com/alpha-api/v2/vuln/one-day";
 
+#[derive(Default)]
 pub struct TiCrawler {
     pub name: String,
     pub display_name: String,
@@ -20,22 +21,9 @@ impl Grab for TiCrawler {
     async fn get_update(&self, _page_limit: i32) -> Result<Vec<VulnInfo>> {
         self.get_vuln_infos().await
     }
-    fn get_provider(&self) -> Provider {
-        Provider {
-            name: self.name.to_owned(),
-            display_name: self.display_name.to_owned(),
-            link: self.link.to_owned(),
-        }
-    }
 
     fn get_name(&self) -> String {
         self.name.to_owned()
-    }
-}
-
-impl Default for TiCrawler {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

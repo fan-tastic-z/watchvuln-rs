@@ -87,17 +87,9 @@ impl fmt::Display for Severity {
     }
 }
 
-#[derive(Debug)]
-pub struct Provider {
-    pub name: String,
-    pub display_name: String,
-    pub link: String,
-}
-
 #[async_trait]
 pub trait Grab: Send + Sync {
     async fn get_update(&self, page_limit: i32) -> Result<Vec<VulnInfo>>;
-    fn get_provider(&self) -> Provider;
     fn get_name(&self) -> String;
 }
 

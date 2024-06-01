@@ -10,7 +10,7 @@ use crate::{
     utils::{http_client::Help, timestamp_to_date},
 };
 
-use super::{Grab, Provider};
+use super::Grab;
 
 const OSCS_PAGE_SIZE: i32 = 10;
 const OSCS_PAGE_DEFAULT: i32 = 1;
@@ -18,6 +18,7 @@ const OSCS_PER_PAGE_DEFAULT: i32 = 10;
 const OSCS_LIST_URL: &str = "https://www.oscs1024.com/oscs/v1/intelligence/list";
 const OSCS_DETAIL_URL: &str = "https://www.oscs1024.com/oscs/v1/vdb/info";
 
+#[derive(Default)]
 pub struct OscCrawler {
     pub name: String,
     pub display_name: String,
@@ -39,22 +40,9 @@ impl Grab for OscCrawler {
         }
         Ok(res)
     }
-    fn get_provider(&self) -> Provider {
-        Provider {
-            name: self.name.to_owned(),
-            display_name: self.display_name.to_owned(),
-            link: self.link.to_owned(),
-        }
-    }
 
     fn get_name(&self) -> String {
         self.name.to_owned()
-    }
-}
-
-impl Default for OscCrawler {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

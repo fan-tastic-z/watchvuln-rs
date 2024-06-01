@@ -8,10 +8,11 @@ use crate::error::{Error, Result};
 use crate::grab::{Severity, VulnInfo};
 use crate::utils::http_client::Help;
 
-use super::{Grab, Provider};
+use super::Grab;
 
 const SEEBUG_LIST_URL: &str = "https://www.seebug.org/vuldb/vulnerabilities";
 
+#[derive(Default)]
 pub struct SeeBugCrawler {
     pub name: String,
     pub display_name: String,
@@ -33,22 +34,9 @@ impl Grab for SeeBugCrawler {
         }
         Ok(res)
     }
-    fn get_provider(&self) -> Provider {
-        Provider {
-            name: self.name.to_owned(),
-            display_name: self.display_name.to_owned(),
-            link: self.link.to_owned(),
-        }
-    }
 
     fn get_name(&self) -> String {
         self.name.to_owned()
-    }
-}
-
-impl Default for SeeBugCrawler {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -85,7 +73,7 @@ impl SeeBugCrawler {
         let url = format!("{}?page={}", SEEBUG_LIST_URL, page);
         let document = self.get_document(&url).await?;
         let selector = Selector::parse(".sebug-table tbody tr")
-            .map_err(|err| eyre!("parse html error {}", err))?;
+            .map_err(|err| eyre!("seebug parse html error {}", err))?;
         let tr_elements = document.select(&selector).collect::<Vec<_>>();
         if tr_elements.is_empty() {
             return Err(Error::Message("failed to get seebug page".into()));

@@ -5,7 +5,7 @@ use chrono::{DateTime, FixedOffset};
 use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
 
-use super::{Grab, Provider, VulnInfo};
+use super::{Grab, VulnInfo};
 use crate::error::Result;
 use crate::{grab::Severity, utils::http_client::Help};
 
@@ -13,6 +13,7 @@ const KEV_URL: &str =
     "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";
 const KEV_PAGE_SIZE: usize = 10;
 
+#[derive(Default)]
 pub struct KevCrawler {
     pub name: String,
     pub display_name: String,
@@ -62,22 +63,9 @@ impl Grab for KevCrawler {
         }
         Ok(res)
     }
-    fn get_provider(&self) -> Provider {
-        Provider {
-            name: self.name.to_owned(),
-            display_name: self.display_name.to_owned(),
-            link: self.link.to_owned(),
-        }
-    }
 
     fn get_name(&self) -> String {
         self.name.to_owned()
-    }
-}
-
-impl Default for KevCrawler {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

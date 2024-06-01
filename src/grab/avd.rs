@@ -11,11 +11,12 @@ use crate::{
     utils::http_client::Help,
 };
 
-use super::{Grab, Provider};
+use super::Grab;
 
 const PAGE_REGEXP: &str = r"第 \d+ 页 / (\d+) 页 ";
 const CVEID_REGEXP: &str = r"^CVE-\d+-\d+$";
 
+#[derive(Default)]
 pub struct AVDCrawler {
     pub name: String,
     pub display_name: String,
@@ -37,22 +38,9 @@ impl Grab for AVDCrawler {
         }
         Ok(res)
     }
-    fn get_provider(&self) -> Provider {
-        Provider {
-            name: self.name.to_owned(),
-            display_name: self.display_name.to_owned(),
-            link: self.link.to_owned(),
-        }
-    }
 
     fn get_name(&self) -> String {
         self.name.to_owned()
-    }
-}
-
-impl Default for AVDCrawler {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -174,7 +162,8 @@ impl AVDCrawler {
     }
 
     fn get_references(&self, document: &Html) -> Result<Vec<String>> {
-        let reference_selector = Selector::parse("td[nowrap='nowrap'] a").unwrap();
+        let reference_selector = Selector::parse("td[nowrap='nowrap'] a")
+            .map_err(|err| eyre!("avd get references selector parse error {}", err))?;
         let references = document
             .select(&reference_selector)
             .filter_map(|el| el.attr("href"))
@@ -184,12 +173,12 @@ impl AVDCrawler {
     }
 
     fn get_solutions(&self, document: &Html) -> Result<String> {
-        let solutions_selector =
-            Selector::parse(".text-detail").map_err(|err| eyre!("parse html error {}", err))?;
+        let solutions_selector = Selector::parse(".text-detail")
+            .map_err(|err| eyre!("avd get solutions selector parse error {}", err))?;
         let solutions = document
             .select(&solutions_selector)
             .nth(1)
-            .unwrap()
+            .ok_or_else(|| Error::Message("avd solutions value not found".to_string()))?
             .text()
             .map(|el| el.trim())
             .collect::<Vec<_>>()
@@ -198,8 +187,8 @@ impl AVDCrawler {
     }
 
     fn get_description(&self, document: &Html) -> Result<String> {
-        let description_selector =
-            Selector::parse(".text-detail div").map_err(|err| eyre!("parse html error {}", err))?;
+        let description_selector = Selector::parse(".text-detail div")
+            .map_err(|err| eyre!("avd get description selector parse error {}", err))?;
         let description = document
             .select(&description_selector)
             .map(|e| e.text().collect::<String>())
@@ -210,11 +199,11 @@ impl AVDCrawler {
 
     fn get_title(&self, document: &Html) -> Result<String> {
         let title_selector = Selector::parse("h5[class='header__title'] .header__title__text")
-            .map_err(|err| eyre!("parse html error {}", err))?;
+            .map_err(|err| eyre!("avd get title selector parse error {}", err))?;
         let title = document
             .select(&title_selector)
             .nth(0)
-            .ok_or_else(|| eyre!("title value not found"))?
+            .ok_or_else(|| eyre!("avd title value not found"))?
             .inner_html()
             .trim()
             .to_string();
@@ -222,11 +211,12 @@ impl AVDCrawler {
     }
 
     fn get_severity(&self, document: &Html) -> Result<Severity> {
-        let level_selector = Selector::parse("h5[class='header__title'] .badge").unwrap();
+        let level_selector = Selector::parse("h5[class='header__title'] .badge")
+            .map_err(|err| eyre!("avd get severity selector parse error {}", err))?;
         let level = document
             .select(&level_selector)
             .nth(0)
-            .ok_or_else(|| eyre!("level value not found"))?
+            .ok_or_else(|| eyre!("avd level value not found"))?
             .inner_html()
             .trim()
             .to_string();
@@ -246,7 +236,7 @@ impl AVDCrawler {
         let metric_value = document
             .select(&value_selector)
             .nth(index)
-            .ok_or_else(|| eyre!("metric value not found"))?
+            .ok_or_else(|| eyre!("avd metric value not found"))?
             .inner_html()
             .trim()
             .to_string();
@@ -256,7 +246,6 @@ impl AVDCrawler {
     fn get_cve_id(&self, document: &Html) -> Result<String> {
         let mut cve_id = self.get_mertric_value(document, 0)?;
         if !Regex::new(CVEID_REGEXP)?.is_match(&cve_id) {
-            // warn!("cve id not found in {}", href);
             cve_id = "".to_string();
         }
         Ok(cve_id)
