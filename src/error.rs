@@ -1,4 +1,4 @@
-use std::num::ParseIntError;
+use std::{num::ParseIntError, time::SystemTimeError};
 
 use hmac::digest::crypto_common;
 use migration::sea_orm;
@@ -66,7 +66,10 @@ pub enum Error {
     IO(#[from] std::io::Error),
 
     #[error(transparent)]
-    DataParse(#[from] chrono::ParseError),
+    DateParse(#[from] chrono::ParseError),
+
+    #[error(transparent)]
+    SystemTime(#[from] SystemTimeError),
 
     #[error(transparent)]
     Any(#[from] Box<dyn std::error::Error + Send + Sync>),

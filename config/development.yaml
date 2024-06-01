@@ -38,3 +38,7 @@ tg_bot:
 ding_bot:
   access_token: {{ get_env(name="DING_ACCESS_TOKEN", default="") }}
   secret_token: {{ get_env(name="DING_SECRET_TOKEN", default="") }}
+
+lark_bot:
+  access_token: {{ get_env(name="LARK_ACCESS_TOKEN", default="") }}
+  secret_token: {{ get_env(name="LARK_SECRET_TOKEN", default="") }}

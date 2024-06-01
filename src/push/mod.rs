@@ -1,10 +1,12 @@
 use crate::{config::Config, error::Result};
 use async_trait::async_trait;
 use dingding::DingDing;
+use lark::Lark;
 use std::sync::Arc;
 use telegram::Telegram;
 
 pub mod dingding;
+pub mod lark;
 pub mod msg_template;
 pub mod telegram;
 
@@ -34,9 +36,17 @@ pub fn init(config: Config) -> BotManager {
         let tg_bot = Telegram::new(config.tg_bot.token, config.tg_bot.chat_id);
         bots.add_bot(tg_bot)
     }
-    if !config.ding_bot.access_token.trim().is_empty() {
+    if !config.ding_bot.access_token.trim().is_empty()
+        && !config.ding_bot.secret_token.trim().is_empty()
+    {
         let ding_bot = DingDing::new(config.ding_bot.access_token, config.ding_bot.secret_token);
         bots.add_bot(ding_bot);
+    }
+    if !config.lark_bot.access_token.trim().is_empty()
+        && !config.lark_bot.secret_token.trim().is_empty()
+    {
+        let lark_bot = Lark::new(config.lark_bot.access_token, config.lark_bot.secret_token);
+        bots.add_bot(lark_bot);
     }
     bots
 }

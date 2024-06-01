@@ -22,6 +22,7 @@ pub struct Config {
     pub logger: Logger,
     pub tg_bot: TgBot,
     pub ding_bot: DingBot,
+    pub lark_bot: LarkBot,
 }
 
 impl Config {
@@ -105,6 +106,12 @@ pub struct TgBot {
 
 #[derive(Debug, Clone, Deserialize, Serialize, Default)]
 pub struct DingBot {
+    pub access_token: String,
+    pub secret_token: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+pub struct LarkBot {
     pub access_token: String,
     pub secret_token: String,
 }
