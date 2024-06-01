@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2] - 2024-06-01
+
+### 🚀 Features
+
+- Support lark bot push message
+
+### 📚 Documentation
+
+- Readme add lark content
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG
+
 ## [0.1.1] - 2024-05-31
 
 ### 🚀 Features
