@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.3] - 2024-06-03
+
+### 🚀 Features
+
+- Support crawling anti data
+
+### 🐛 Bug Fixes
+
+- Update threadbook check_valuable
+
+### 🚜 Refactor
+
+- Clean no use code
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG.md add lark bot
+
 ## [0.1.2] - 2024-06-01
 
 ### 🚀 Features
