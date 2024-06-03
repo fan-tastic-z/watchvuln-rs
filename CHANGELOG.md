@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+
+### 🐛 Bug Fixes
+
+- Update threatbook check_valuable
+- Models no set is_valuable
+
+## [0.1.4] - 2024-06-03
+
+### 🐛 Bug Fixes
+
+- Ding bot push msg timestamp error
+
 ## [0.1.3] - 2024-06-03
 
 ### 🚀 Features
@@ -16,9 +29,14 @@ All notable changes to this project will be documented in this file.
 
 - Clean no use code
 
+### 📚 Documentation
+
+- Update readme add anti
+
 ### ⚙️ Miscellaneous Tasks
 
 - Update CHANGELOG.md add lark bot
+- Update CHANGELOG.md
 
 ## [0.1.2] - 2024-06-01
 
