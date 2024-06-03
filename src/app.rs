@@ -154,15 +154,26 @@ impl WatchVulnApp {
     }
 
     async fn push_init_msg(&self, local_count: u64) -> Result<()> {
+        let grabs = self.get_all_grabs();
         let init_msg = render_init(
             VERSION.to_string(),
             local_count,
             self.app_context.config.task.cron_config.clone(),
+            grabs,
         )?;
 
         self.push_all("WatchVuln-rs init success".to_string(), init_msg)
             .await;
         Ok(())
+    }
+
+    fn get_all_grabs(&self) -> Vec<String> {
+        let grabs = self.grabs.clone();
+        let mut res = Vec::new();
+        for v in grabs.values() {
+            res.push(v.get_name())
+        }
+        res
     }
 
     pub async fn push_all(&self, title: String, msg: String) -> bool {

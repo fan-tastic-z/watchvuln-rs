@@ -14,7 +14,6 @@ impl Default for Help {
 }
 impl Help {
     pub fn new(mut headers: HeaderMap) -> Self {
-        // let mut headers = header::HeaderMap::new();
         headers.insert("User-Agent", header::HeaderValue::from_static("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"));
         let client = reqwest::Client::builder()
             .redirect(reqwest::redirect::Policy::none())

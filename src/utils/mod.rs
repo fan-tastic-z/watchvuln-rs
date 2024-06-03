@@ -16,6 +16,13 @@ pub fn check_over_two_week(date: &str) -> Result<bool> {
     Ok(false)
 }
 
+// data_str_format convernt 20240603 to 2024-06-03
+pub fn data_str_format(date: &str) -> Result<String> {
+    let date = NaiveDate::parse_from_str(date, "%Y%m%d")?;
+    let formatted_date = format!("{}", date.format("%Y-%m-%d"));
+    Ok(formatted_date)
+}
+
 pub fn timestamp_to_date(timestamp: i64) -> Result<String> {
     let dt = DateTime::from_timestamp_millis(timestamp);
     if let Some(dt) = dt {

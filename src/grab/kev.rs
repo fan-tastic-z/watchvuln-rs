@@ -4,6 +4,7 @@ use async_trait::async_trait;
 use chrono::{DateTime, FixedOffset};
 use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
+use tracing::info;
 
 use super::{Grab, VulnInfo};
 use crate::error::Result;
@@ -61,11 +62,12 @@ impl Grab for KevCrawler {
             };
             res.push(vuln_info)
         }
+        info!("{} crawling count {}", self.get_name(), res.len());
         Ok(res)
     }
 
     fn get_name(&self) -> String {
-        self.name.to_owned()
+        self.display_name.to_owned()
     }
 }
 

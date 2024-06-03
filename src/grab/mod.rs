@@ -1,3 +1,4 @@
+pub mod anti;
 pub mod avd;
 pub mod kev;
 pub mod oscs;
@@ -8,6 +9,7 @@ pub mod ti;
 use std::{collections::HashMap, fmt};
 
 use crate::{error::Result, models::_entities::vuln_informations::Model};
+use anti::AntiCrawler;
 use async_trait::async_trait;
 pub use avd::AVDCrawler;
 use serde::{Deserialize, Serialize};
@@ -120,5 +122,6 @@ pub fn init() -> GrabManager {
     manager.register(Box::new(KevCrawler::new()));
     manager.register(Box::new(TiCrawler::new()));
     manager.register(Box::new(ThreadBookCrawler::new()));
+    manager.register(Box::new(AntiCrawler::new()));
     manager
 }

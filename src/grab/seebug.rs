@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use eyre::eyre;
 use reqwest::header::{self};
 use scraper::{ElementRef, Html, Selector};
-use tracing::warn;
+use tracing::{info, warn};
 
 use crate::error::{Error, Result};
 use crate::grab::{Severity, VulnInfo};
@@ -32,11 +32,12 @@ impl Grab for SeeBugCrawler {
             let data = self.parse_page(i).await?;
             res.extend(data)
         }
+        info!("{} crawling count {}", self.get_name(), res.len());
         Ok(res)
     }
 
     fn get_name(&self) -> String {
-        self.name.to_owned()
+        self.display_name.to_owned()
     }
 }
 

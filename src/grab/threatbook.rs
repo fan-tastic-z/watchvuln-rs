@@ -28,10 +28,6 @@ impl Grab for ThreadBookCrawler {
         let crawler = ThreadBookCrawler::new();
         let home_page_resp: ThreadBookHomePage =
             crawler.help.get_json(HOME_PAGE_URL).await?.json().await?;
-        info!(
-            "thread book get {} vulns",
-            home_page_resp.data.high_risk.len()
-        );
         let mut res = Vec::with_capacity(home_page_resp.data.high_risk.len());
         for v in home_page_resp.data.high_risk {
             let mut is_valuable = false;
@@ -72,11 +68,12 @@ impl Grab for ThreadBookCrawler {
             };
             res.push(vuln);
         }
+        info!("{} crawling count {}", self.get_name(), res.len());
         Ok(res)
     }
 
     fn get_name(&self) -> String {
-        self.name.to_owned()
+        self.display_name.to_owned()
     }
 }
 

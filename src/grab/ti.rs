@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
+use tracing::info;
 
 use super::{Grab, Severity, VulnInfo};
 use crate::error::Result;
@@ -23,7 +24,7 @@ impl Grab for TiCrawler {
     }
 
     fn get_name(&self) -> String {
-        self.name.to_owned()
+        self.display_name.to_owned()
     }
 }
 
@@ -84,6 +85,7 @@ impl TiCrawler {
             }
             vuln_infos.push(vuln_info);
         }
+        info!("{} crawling count {}", self.get_name(), vuln_infos.len());
         Ok(vuln_infos)
     }
 

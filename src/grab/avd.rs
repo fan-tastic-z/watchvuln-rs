@@ -3,7 +3,7 @@ use eyre::eyre;
 use regex::Regex;
 use reqwest::{header, Url};
 use scraper::{Html, Selector};
-use tracing::{debug, warn};
+use tracing::{debug, info, warn};
 
 use crate::{
     error::{Error, Result},
@@ -36,11 +36,12 @@ impl Grab for AVDCrawler {
             let data = self.parse_page(i).await?;
             res.extend(data)
         }
+        info!("{} crawling count {}", self.get_name(), res.len());
         Ok(res)
     }
 
     fn get_name(&self) -> String {
-        self.name.to_owned()
+        self.display_name.to_owned()
     }
 }
 
