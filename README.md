@@ -12,6 +12,7 @@
 | CISA KEV                     | <https://www.cisa.gov/known-exploited-vulnerabilities-catalog> | 全部推送                                                                     |
 | 奇安信威胁情报中心           | <https://ti.qianxin.com/>                                      | 等级为高危严重**并且**包含 `奇安信CERT验证` `POC公开` `技术细节公布`标签之一 |
 | 微步在线研究响应中心(公众号) | <https://x.threatbook.com/v5/vulIntelligence>                  | 等级为高危或严重                                                             |
+| 安天威胁情报中心             | <https://www.antiycloud.com/#/antiy/safenotice>                | 全部推送                                                                     |
 
 ## 开发
 
