@@ -28,9 +28,10 @@ const INIT_MSG_TEMPLATE: &str = r#"
 当前版本: {{ version }}
 本地漏洞数量: {{ vuln_count }}
 检查周期配置: {{ cron_config }}
-
-目前爬取的数据源：{% for v in grabs %}
-{{ loop.index }}.{{ v }}{% endfor %}"#;
+目前爬取的数据源:
+{% for v in grabs %}
+{{ loop.index }}.{{ v }}
+{% endfor %}"#;
 
 const MAX_REFERENCE_LENGTH: usize = 8;
 

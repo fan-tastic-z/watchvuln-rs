@@ -1,3 +1,5 @@
+use std::time::SystemTime;
+
 use crate::{
     error::{Error, Result},
     utils::{calc_hmac_sha256, http_client::Help},
@@ -72,8 +74,10 @@ impl DingDing {
         Help::new(headers)
     }
     pub fn generate_sign(&self) -> Result<Sign> {
-        let now = chrono::Local::now().timestamp();
-        let timestamp_and_secret = &format!("{}\n{}", now, self.secret_token);
+        let timestamp = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)?
+            .as_millis();
+        let timestamp_and_secret = &format!("{}\n{}", timestamp, self.secret_token);
         let hmac_sha256 = calc_hmac_sha256(
             self.secret_token.as_bytes(),
             timestamp_and_secret.as_bytes(),
@@ -81,7 +85,7 @@ impl DingDing {
         let sign = BASE64_STANDARD.encode(hmac_sha256);
         Ok(Sign {
             access_token: self.access_token.clone(),
-            timestamp: now,
+            timestamp,
             sign,
         })
     }
@@ -96,6 +100,6 @@ pub struct DingResponse {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Sign {
     pub access_token: String,
-    pub timestamp: i64,
+    pub timestamp: u128,
     pub sign: String,
 }
