@@ -88,6 +88,7 @@ impl super::_entities::vuln_informations::Model {
                 vuln_model.tags = ActiveValue::set(Some(vuln.tags));
                 vuln_model.from = ActiveValue::set(vuln.from);
                 vuln_model.reasons = ActiveValue::set(Some(vuln.reasons));
+                vuln_model.is_valuable = ActiveValue::set(vuln.is_valuable);
                 let m = vuln_model.update(&txn).await?;
                 txn.commit().await?;
                 return Ok(m);
@@ -110,6 +111,7 @@ impl super::_entities::vuln_informations::Model {
             from: ActiveValue::set(vuln.from),
             pushed: ActiveValue::set(false),
             reasons: ActiveValue::set(Some(vuln.reasons)),
+            is_valuable: ActiveValue::set(vuln.is_valuable),
             ..Default::default()
         }
         .insert(&txn)
@@ -158,6 +160,7 @@ impl super::_entities::vuln_informations::Model {
             references: ActiveValue::set(Some(vuln.references)),
             tags: ActiveValue::set(Some(vuln.tags)),
             from: ActiveValue::set(vuln.from),
+            is_valuable: ActiveValue::set(vuln.is_valuable),
             ..Default::default()
         }
         .insert(&txn)
