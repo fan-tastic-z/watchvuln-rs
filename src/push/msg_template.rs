@@ -8,9 +8,9 @@ const VULN_INFO_MSG_TEMPLATE: &str = r####"
 
 - CVE编号: {% if cve %} {{ cve }}{% else %}暂无 {% endif %}
 - 危害定级: **{{ severity }}**
-- 漏洞标签: {% for tag in tags %}**{{ tag }}**{% endfor %}
+- 漏洞标签: {{ tags | join(sep=" ") }}
 - 披露日期: **{{ disclosure }}**
-- 推送原因: {% for v in reasons %}{{ v }}{% endfor %}
+- 推送原因: {{ reasons | join(sep=" ") }}
 - 信息来源: [{{ from }}]
 
 {% if description %}### **漏洞描述**
@@ -90,7 +90,7 @@ mod tests {
 
     #[test]
     fn test_reader_vulninfo() -> Result<()> {
-        let tags: Vec<String> = Vec::new();
+        let tags: Vec<String> = vec!["有漏洞分析".to_string(), "有修复方案".to_string()];
         let reasons: Vec<String> = Vec::new();
 
         let v = VulnInfo {
