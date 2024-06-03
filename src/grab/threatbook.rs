@@ -116,7 +116,7 @@ impl ThreadBookCrawler {
     }
 
     pub fn check_valuable(&self, data: &HighRisk) -> Result<bool> {
-        if !data.poc_exist || !data.premium {
+        if !data.poc_exist && !data.premium {
             return Ok(false);
         }
 
