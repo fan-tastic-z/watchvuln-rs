@@ -35,7 +35,7 @@ impl Grab for ThreadBookCrawler {
                 is_valuable = res
             }
 
-            let disclosure = self.get_disclosure(&v);
+            let disclosure = v.vuln_update_time.clone();
 
             let mut tags = Vec::new();
             if let Some(is_0day) = v.is_0day {
@@ -52,6 +52,7 @@ impl Grab for ThreadBookCrawler {
             if v.solution {
                 tags.push("有修复方案".to_string());
             }
+
             let vuln = VulnInfo {
                 unique_key: v.id,
                 title: v.vuln_name_zh,
@@ -98,38 +99,16 @@ impl ThreadBookCrawler {
         }
     }
 
-    pub fn get_disclosure(&self, data: &HighRisk) -> String {
-        if !data.vuln_publish_time.is_empty() {
-            data.vuln_publish_time.clone()
-        } else if let Some(vuln_update_time) = &data.vuln_update_time {
-            if !vuln_update_time.is_empty() {
-                vuln_update_time.to_string()
-            } else {
-                "".to_string()
-            }
-        } else {
-            "".to_string()
-        }
-    }
-
+    // The data currently judged to be high risk are all updated data.
+    // This is the judgment for the time being. If there are any problems, adjustments will be made later.
     pub fn check_valuable(&self, data: &HighRisk) -> Result<bool> {
         if !data.poc_exist && !data.premium {
             return Ok(false);
         }
-
-        if data.vuln_publish_time.is_empty() && data.vuln_update_time.is_none() {
+        if check_over_two_week(&data.vuln_update_time)? {
             return Ok(false);
         }
-        if !data.vuln_publish_time.is_empty() {
-            return check_over_two_week(&data.vuln_publish_time);
-        }
-        if let Some(vuln_update_time) = &data.vuln_update_time {
-            if !vuln_update_time.is_empty() {
-                return check_over_two_week(vuln_update_time);
-            }
-        }
-
-        Ok(false)
+        Ok(true)
     }
 }
 
@@ -148,7 +127,7 @@ pub struct Data {
 pub struct HighRisk {
     pub id: String,
     pub vuln_name_zh: String,
-    pub vuln_update_time: Option<String>,
+    pub vuln_update_time: String,
     pub affects: Vec<String>,
     pub vuln_publish_time: String,
     #[serde(rename = "pocExist")]

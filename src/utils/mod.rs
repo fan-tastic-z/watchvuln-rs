@@ -11,9 +11,9 @@ pub fn check_over_two_week(date: &str) -> Result<bool> {
     let now = Utc::now().naive_utc().date();
     let two_weeks_ago = now - Duration::weeks(2);
     if target_date >= two_weeks_ago && target_date <= now {
-        return Ok(true);
+        return Ok(false);
     }
-    Ok(false)
+    Ok(true)
 }
 
 // data_str_format convernt 20240603 to 2024-06-03
@@ -50,5 +50,14 @@ mod tests {
     pub fn test_timestamp_to_date() {
         let res = timestamp_to_date(1715931545000).unwrap();
         assert_eq!(res, "2024-05-17");
+    }
+
+    #[test]
+    pub fn test_check_over_two_week() -> Result<()> {
+        let res = check_over_two_week("2024-06-03")?;
+        assert!(!res);
+        let res = check_over_two_week("2024-05-03")?;
+        assert!(res);
+        Ok(())
     }
 }
