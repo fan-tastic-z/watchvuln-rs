@@ -2,12 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.1.6] - 2024-06-04
+
+### 🐛 Bug Fixes
+
+- Push message from model to vulninfo severtiy error
+
+### 🚜 Refactor
+
+- Update msg_template
+
+## [0.1.5] - 2024-06-03
 
 ### 🐛 Bug Fixes
 
 - Update threatbook check_valuable
 - Models no set is_valuable
+
+### ⚙️ Miscellaneous Tasks
+
+- Update code version and CHANGELOG
 
 ## [0.1.4] - 2024-06-03
 
