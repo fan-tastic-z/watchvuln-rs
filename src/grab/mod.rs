@@ -36,10 +36,10 @@ pub struct VulnInfo {
 impl From<Model> for VulnInfo {
     fn from(v: Model) -> Self {
         let severtiy = match v.severtiy.as_str() {
-            "低危" => Severity::Low,
-            "中危" => Severity::Medium,
-            "高危" => Severity::High,
-            "严重" => Severity::Critical,
+            "Low" => Severity::Low,
+            "Medium" => Severity::Medium,
+            "High" => Severity::High,
+            "Critical" => Severity::Critical,
             _ => Severity::Low,
         };
 
