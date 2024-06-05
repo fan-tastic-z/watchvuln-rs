@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.7] - 2024-06-05
+
+### 🚀 Features
+
+- Support crawling github for poc
+
+### ⚙️ Miscellaneous Tasks
+
+- Update CHANGELOG
+- Update version to 0.1.7
+
 ## [0.1.6] - 2024-06-04
 
 ### 🐛 Bug Fixes
