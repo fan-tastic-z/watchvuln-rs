@@ -63,6 +63,7 @@ impl Grab for AntiCrawler {
                 from,
                 tags: vec![],
                 reasons: vec![],
+                github_search: vec![],
                 is_valuable: true,
             };
             res.push(vuln);

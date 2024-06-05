@@ -146,6 +146,7 @@ impl OscCrawler {
             from: self.link.clone(),
             tags: vec![],
             reasons: vec![],
+            github_search: vec![],
             is_valuable,
         };
         Ok(data)

@@ -120,6 +120,29 @@ impl super::_entities::vuln_informations::Model {
         Ok(v)
     }
 
+    pub async fn update_github_search_by_key(
+        db: &DatabaseConnection,
+        key: &str,
+        links: Vec<String>,
+    ) -> ModelResult<()> {
+        let txn = db.begin().await?;
+        let v = vuln_informations::Entity::find()
+            .filter(vuln_informations::Column::Key.eq(key))
+            .one(&txn)
+            .await?;
+        if let Some(v) = v {
+            let mut v: vuln_informations::ActiveModel = v.into();
+            v.github_search = ActiveValue::set(Some(links));
+            v.update(&txn).await?;
+            txn.commit().await?;
+            Ok(())
+        } else {
+            Err(ModelError::EntityUpdateNotFound {
+                key: key.to_string(),
+            })
+        }
+    }
+
     pub async fn update_pushed_by_key(db: &DatabaseConnection, key: String) -> ModelResult<()> {
         let txn = db.begin().await?;
         let v = vuln_informations::Entity::find()

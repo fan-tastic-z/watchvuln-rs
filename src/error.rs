@@ -72,6 +72,9 @@ pub enum Error {
     SystemTime(#[from] SystemTimeError),
 
     #[error(transparent)]
+    Octocrab(#[from] octocrab::Error),
+
+    #[error(transparent)]
     Any(#[from] Box<dyn std::error::Error + Send + Sync>),
 
     #[error(transparent)]

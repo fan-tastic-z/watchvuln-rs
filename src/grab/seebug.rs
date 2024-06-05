@@ -143,6 +143,7 @@ impl SeeBugCrawler {
                 from: href,
                 tags,
                 reasons: vec![],
+                github_search: vec![],
                 is_valuable,
             };
             res.push(data);

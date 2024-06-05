@@ -75,6 +75,7 @@ impl TiCrawler {
                 from: format!("https://ti.qianxin.com/vulnerability/detail/{}", detail.id),
                 tags,
                 reasons: vec![],
+                github_search: vec![],
                 is_valuable,
             };
             if vuln_infos

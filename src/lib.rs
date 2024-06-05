@@ -7,4 +7,5 @@ pub mod grab;
 pub mod logger;
 pub mod models;
 pub mod push;
+pub mod search;
 pub mod utils;

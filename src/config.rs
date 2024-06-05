@@ -23,6 +23,7 @@ pub struct Config {
     pub tg_bot: TgBot,
     pub ding_bot: DingBot,
     pub lark_bot: LarkBot,
+    pub github_search: bool,
 }
 
 impl Config {

@@ -65,6 +65,7 @@ impl Grab for ThreadBookCrawler {
                 from: LINK.to_string(),
                 tags,
                 reasons: Vec::new(),
+                github_search: vec![],
                 is_valuable,
             };
             res.push(vuln);

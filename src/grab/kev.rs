@@ -57,6 +57,7 @@ impl Grab for KevCrawler {
                     vuln.product.to_string(),
                     "在野利用".to_string(),
                 ],
+                github_search: vec![],
                 reasons: vec![],
                 is_valuable,
             };

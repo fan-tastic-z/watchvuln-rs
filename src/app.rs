@@ -18,6 +18,7 @@ use crate::{
         msg_template::{reader_vulninfo, render_init},
         BotManager,
     },
+    search::search_github_poc,
 };
 
 lazy_static! {
@@ -130,8 +131,23 @@ impl WatchVulnApp {
                     info!("{} has been pushed, skipped", vuln.key);
                     continue;
                 }
+
                 let key = vuln.key.clone();
                 let title = vuln.title.clone();
+                if !vuln.cve.is_empty() && self.app_context.config.github_search {
+                    let links = search_github_poc(&vuln.cve).await;
+                    info!("{} found {} links from github", &vuln.cve, links.len());
+                    if let Err(err) = vuln_informations::Model::update_github_search_by_key(
+                        &self.app_context.db,
+                        &key,
+                        links,
+                    )
+                    .await
+                    {
+                        warn!("update vuln {} github_search error: {}", &vuln.cve, err);
+                    }
+                    todo!()
+                }
                 let msg = match reader_vulninfo(vuln.into()) {
                     Ok(msg) => msg,
                     Err(err) => {

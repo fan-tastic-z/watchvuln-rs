@@ -42,3 +42,5 @@ ding_bot:
 lark_bot:
   access_token: {{ get_env(name="LARK_ACCESS_TOKEN", default="") }}
   secret_token: {{ get_env(name="LARK_SECRET_TOKEN", default="") }}
+
+github_search: true

@@ -30,6 +30,7 @@ pub struct VulnInfo {
     pub from: String,
     pub tags: Vec<String>,
     pub reasons: Vec<String>,
+    pub github_search: Vec<String>,
     pub is_valuable: bool,
 }
 
@@ -58,6 +59,11 @@ impl From<Model> for VulnInfo {
             None => Vec::new(),
         };
 
+        let github_search = match v.github_search {
+            Some(github_search) => github_search,
+            None => Vec::new(),
+        };
+
         VulnInfo {
             unique_key: v.key,
             title: v.title,
@@ -70,6 +76,7 @@ impl From<Model> for VulnInfo {
             from: v.from,
             tags,
             reasons,
+            github_search,
             is_valuable: v.is_valuable,
         }
     }

@@ -1,10 +1,16 @@
 pub mod http_client;
 
 use crate::error::{Error, Result};
-use chrono::{DateTime, Duration, NaiveDate, Utc};
+use chrono::{DateTime, Duration, Local, NaiveDate, Utc};
 use hmac::{Hmac, Mac};
 use sha2::Sha256;
 use tera::{Context, Tera};
+
+pub fn get_last_year_data() -> String {
+    let current_date = Local::now();
+    let last_year = current_date - Duration::days(365);
+    last_year.format("%Y-%m-%d").to_string()
+}
 
 pub fn check_over_two_week(date: &str) -> Result<bool> {
     let target_date = NaiveDate::parse_from_str(date, "%Y-%m-%d")?;

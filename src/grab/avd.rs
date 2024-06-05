@@ -146,6 +146,7 @@ impl AVDCrawler {
             from: self.link.clone(),
             tags,
             reasons: vec![],
+            github_search: vec![],
             is_valuable,
         };
         Ok(data)
