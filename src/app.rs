@@ -125,7 +125,7 @@ impl WatchVulnApp {
     }
 
     async fn push(&self, vulns: Vec<Model>) {
-        for vuln in vulns.into_iter() {
+        for mut vuln in vulns.into_iter() {
             if vuln.is_valuable {
                 if vuln.pushed {
                     info!("{} has been pushed, skipped", vuln.key);
@@ -141,12 +141,13 @@ impl WatchVulnApp {
                         if let Err(err) = vuln_informations::Model::update_github_search_by_key(
                             &self.app_context.db,
                             &key,
-                            links,
+                            links.clone(),
                         )
                         .await
                         {
                             warn!("update vuln {} github_search error: {}", &vuln.cve, err);
                         }
+                        vuln.github_search = Some(links);
                     }
                 }
                 let msg = match reader_vulninfo(vuln.into()) {
