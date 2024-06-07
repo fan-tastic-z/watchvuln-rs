@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+
+### 🐛 Bug Fixes
+
+- Update sea-orm version to 1.0.0-rc.5 and Solve dependency security issues
+- Search github no data dont't exec db save
+
 ## [0.1.7] - 2024-06-05
 
 ### 🚀 Features
@@ -12,6 +19,7 @@ All notable changes to this project will be documented in this file.
 
 - Update CHANGELOG
 - Update version to 0.1.7
+- Update CHANGELOG.md
 
 ## [0.1.6] - 2024-06-04
 
