@@ -20,11 +20,12 @@ const VULN_INFO_MSG_TEMPLATE: &str = r####"
 {{ solutions }}
 {% endif %}
 {% if references%}### **参考链接**
-{% for reference in references %}{{ loop.index }}.{{ reference }}
+{% for reference in references %}{{ loop.index }}. {{ reference }}
 {% endfor %}{% endif %}
 
 {% if cve %}### **开源检索**
-{% if github_search | length > 0 %}{% for link in github_search %}{{ loop.index }}.{{ link }}{% endfor %}{% else %}暂未找到{% endif %}{% endif %}"####;
+{% if github_search | length > 0 %}{% for link in github_search %}{{ loop.index }}. {{ link }}
+{% endfor %}{% else %}暂未找到{% endif %}{% endif %}"####;
 
 const INIT_MSG_TEMPLATE: &str = r#"
 数据初始化完成
@@ -33,7 +34,7 @@ const INIT_MSG_TEMPLATE: &str = r#"
 检查周期配置: {{ cron_config }}
 目前爬取的数据源:
 {% for v in grabs %}
-{{ loop.index }}.{{ v }}
+{{ loop.index }}. {{ v }}
 {% endfor %}"#;
 
 const MAX_REFERENCE_LENGTH: usize = 8;
