@@ -2,12 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.1.9] - 2024-06-09
+
+### 🐛 Bug Fixes
+
+- Render vuln info no github_search data
+- Push msg template format
+- Ti response null error and seebug no get cve error
+
+### ⚙️ Miscellaneous Tasks
+
+- Update version to 0.1.9
+
+## [0.1.8] - 2024-06-07
 
 ### 🐛 Bug Fixes
 
 - Update sea-orm version to 1.0.0-rc.5 and Solve dependency security issues
 - Search github no data dont't exec db save
+
+### 🚜 Refactor
+
+- Update CHANGELOG
 
 ## [0.1.7] - 2024-06-05
 
