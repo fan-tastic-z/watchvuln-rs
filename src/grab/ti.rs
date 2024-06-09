@@ -146,7 +146,7 @@ pub struct TiVulnDetail {
     pub description: String,
     pub description_en: String,
     pub change_impact: i32,
-    pub operator_hid: String,
+    pub operator_hid: Option<String>,
     pub create_hid: Option<String>,
     pub channel: Option<String>,
     pub tracking_id: Option<String>,

@@ -231,14 +231,14 @@ impl SeeBugCrawler {
             .attr("data-original-title")
             .ok_or_else(|| eyre!("data-original-title not found"))?
             .trim();
-        let mut cve_id = "";
         if cve_ids.contains('、') {
-            cve_id = cve_ids
+            return Ok(cve_ids
                 .split('、')
                 .nth(0)
                 .ok_or_else(|| eyre!("cve_ids split not found cve id"))?
+                .to_owned());
         }
-        Ok(cve_id.to_string())
+        Ok(cve_ids.to_string())
     }
 
     fn get_tag(&self, el: ElementRef) -> Result<String> {
@@ -253,5 +253,52 @@ impl SeeBugCrawler {
             .ok_or_else(|| eyre!("tag data-original-title not found"))?
             .trim();
         Ok(tag.to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    #[tokio::test]
+    async fn test_seebug_get_cve() -> Result<()> {
+        let seebug = SeeBugCrawler::new();
+        // read fixtures/seebug.html
+        let html = fs::read_to_string("fixtures/seebug.html")?;
+        let document = Html::parse_document(&html);
+        let selector = Selector::parse(".sebug-table tbody tr")
+            .map_err(|err| eyre!("seebug parse html error {}", err))?;
+        let tr_elements = document.select(&selector).collect::<Vec<_>>();
+        if tr_elements.is_empty() {
+            return Err(Error::Message("failed to get seebug page".into()));
+        }
+        let first = tr_elements
+            .first()
+            .ok_or_else(|| Error::Message("failed to get seebug page first element".to_string()))?
+            .to_owned();
+        let cve_id = seebug.get_cve_id(first)?;
+        assert_eq!(cve_id, "CVE-2024-23692");
+        Ok(())
+    }
+    #[tokio::test]
+    async fn test_many_cve_seebug_get_cve() -> Result<()> {
+        let seebug = SeeBugCrawler::new();
+        // read fixtures/seebug.html
+        let html = fs::read_to_string("fixtures/seebug_many_cve.html")?;
+        let document = Html::parse_document(&html);
+        let selector = Selector::parse(".sebug-table tbody tr")
+            .map_err(|err| eyre!("seebug parse html error {}", err))?;
+        let tr_elements = document.select(&selector).collect::<Vec<_>>();
+        if tr_elements.is_empty() {
+            return Err(Error::Message("failed to get seebug page".into()));
+        }
+        let first = tr_elements
+            .first()
+            .ok_or_else(|| Error::Message("failed to get seebug page first element".to_string()))?
+            .to_owned();
+        let cve_id = seebug.get_cve_id(first)?;
+        assert_eq!(cve_id, "CVE-2023-50445");
+        Ok(())
     }
 }

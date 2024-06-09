@@ -1,0 +1,7280 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="no-js">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport" />
+    <title>漏洞列表 - 知道创宇 Seebug 漏洞平台</title>
+    <meta name="description" content="Seebug,洞悉漏洞，让你掌握前沿手漏洞情报！Seebug 提供最新漏洞信息、漏洞搜索、漏洞修复、漏洞目录、安全文档、漏洞趋势分析等">
+    <meta name="keywords"
+        content="漏洞情报,漏洞库,Seebug,sebug, exploits,PoC,vulnerability,漏洞,漏洞平台,漏洞信息,漏洞PoC,漏洞详情,漏洞搜索,漏洞修复,漏洞目录,安全文档,漏洞趋势">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <meta name="baidu-site-verification" content="u5LqRHkMu0" />
+    <link rel="Shortcut Icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <link rel="stylesheet" href="/static/dist2/styles/main.css?v=2016061401" />
+    <link rel="stylesheet" href="/static/dist2/bower_components/font-awesome/css/font-awesome.min.css?v=2016061401" />
+    <script src="/static/dist2/scripts/vendor/modernizr.js"></script>
+
+    <style>
+        .navbar-user .dropdown-menu {
+            top: 4px;
+            right: -1px;
+            box-shadow: none;
+        }
+
+        .navbar-user .dropdown-menu .search-wrapper {
+            padding: 0 5px;
+        }
+
+        .navbar-user .search-wrapper .search-form .fa {
+            top: 18px;
+            left: auto;
+            right: 6px;
+        }
+
+        .new-tip {
+            position: absolute;
+            font-size: 12px;
+            top: 1px;
+            left: 35px;
+            padding: 2px 3px;
+            line-height: 12px;
+            background-color: #e60012;
+            color: #fff;
+        }
+
+        .search-form input {
+            min-width: 100px;
+            height: auto;
+            padding: 6px 25px 6px 6px;
+            color: #444;
+
+        }
+
+        @media (min-width: 1200px) {
+            .search-form input {
+                min-width: 200px;
+            }
+        }
+
+        .navbar-right {
+            position: absolute;
+            right: 10%;
+        }
+
+        @media (min-width: 992px) {
+            .navbar-right {
+                position: absolute;
+                right: 0;
+                margin-right: 20px;
+            }
+        }
+
+        .site-nav .navbar-nav .active>a,
+        .site-nav .navbar-nav .open>a,
+        .site-nav .navbar-nav .open .fa-angle-down,
+        .site-nav .navbar-nav .active .fa-angle-down {
+            color: #b2976a;
+        }
+
+        .site-header .tooltip {
+            white-space: nowrap;
+            top: -17px !important;
+        }
+
+        @media (max-width: 1140px) {
+            .site-header {
+                height: 70px;
+            }
+
+            .site-header .logo-wrapper {
+                line-height: 70px;
+            }
+
+            .site-nav-desktop {
+                display: none;
+            }
+
+            .site-nav-mobile {
+                display: block;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+
+            .site-header .logo-wrapper .img-logo {
+                height: 50px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            body {
+                overflow-x: hidden;
+            }
+        }
+
+        @media (max-width: 460px) {
+            .site-header .logo-wrapper .img-logo {
+                height: 35px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .site-header .logo-wrapper .img-logo {
+                height: 29px;
+            }
+        }
+
+        .search-form {
+            display: none;
+            padding-top: 10px;
+            position: absolute;
+            right: 10%;
+        }
+    </style>
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "//hm.baidu.com/hm.js?6b15558d6e6f640af728f65c4a5bf687";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+</head>
+
+<body>
+    <div class="weixin-share-img" style="display: none">
+        <img src="/static/dist2/images/weixin-share-sm.jpg" alt="Seebug" />
+    </div>
+    <!--[if lt IE 10]>
+    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+      your browser</a> to improve your experience.</p>
+    <![endif]-->
+    <header class="site-header dark">
+        <div class="" style="padding: 0 30px;">
+            <div class="logo-wrapper">
+                <a href="https://www.knownsec.com?from=seebug_logo"><img class="img-logo"
+                        src="/static/dist2/images/knownsec-logo.png" alt="Knownsec-logo" /></a>
+                <img class="img-line" src="/static/dist2/images/line.png" />
+                <a href="/"><img class="img-logo" src="/static/dist2/images/seebug-logo2023.png?v=2" alt="Seebug-logo"
+                        style="height: 50px" /></a>
+            </div>
+            <nav class="site-nav  site-nav-desktop" style="margin: 0 auto;width: 800px;">
+                <ul class="nav navbar-nav">
+                    <li><a href="/">首页</a></li>
+                    <li><a href="/contribute/vul">提交漏洞</a></li>
+                    <!--<li><a href="https://nvwa.org">女娲计划</a></li>-->
+                    <li><a href="/hackers">排行榜</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">市场 <i class="fa fa-angle-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <!--<li ><a href="/vuldb/reward/poc">悬赏</a></li>-->
+                            <li><a href="/exchange/goods">兑换</a></li>
+                            <li><a href="/vuldb/vulnerabilities?has_poc=true">最新 PoC</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/search/">搜索</a>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">社区 <i class="fa fa-angle-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="http://pocsuite.org/" target='_blank'>Pocsuite</a></li>
+                            <li><a href="http://ceye.io/" target='_blank'>Ceye.io</a></li>
+                            <li><a href="http://paper.seebug.org/" target='_blank'>Paper</a></li>
+                            <!-- <li ><a href="https://talk.telnet404.com/" target='_blank'>Talk</a></li> -->
+                            <li><a href="http://kcon.knownsec.com/" target='_blank'>KCon</a></li>
+                            <li><a href="https://www.zoomeye.org/" target='_blank'>ZoomEye</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">关于 <i class="fa fa-angle-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/stat">数据统计</a></li>
+                            <li><a href="/help/about">漏洞市场</a></li>
+                            <li><a href="https://pocsuite.org/guide/what-is-pocsuite3.html">开发文档</a></li>
+                            <li><a href="/help/user_level">相关说明</a></li>
+                            <li><a href="/help/feedback"> 意见反馈</a></li>
+                            <li><a href="/help/reward">帮助</a></li>
+                        </ul>
+                </ul>
+
+
+
+                <!-- <li ><a href="https://www.seebug.org/static/tools/index.html" target="_blank">Tools</a><span class="new-tip">New</span></li> -->
+
+                </ul>
+            </nav>
+
+            <!--登录前-->
+            <ul class="nav navbar-nav navbar-right navbar-user site-nav-desktop">
+                <li>
+                    <a href="#" class="serch-icon" role="button" aria-haspopup="true" aria-expanded="false"><i
+                            class="fa fa-search"></i></a>
+                <li class="search-wrapper">
+                    <form class="search-form" action="/search" method="get">
+                        <input type="text" name="keywords" class="form-control" placeholder="search">
+                        <i class="fa fa-search"></i>
+                    </form>
+                </li>
+                </li>
+                <li><a class="login-link" href="/accounts/login/?next=/vuldb/vulnerabilities">登录</a></li>
+                <li><span
+                        style="display: inline-block;width: 1px;height: 15px;vertical-align: middle;background-color: #aaa;margin: 15px 10px;"></span>
+                </li>
+                <li><a class="registe-link" href="/accounts/register?next=/vuldb/vulnerabilities">注册</a></li>
+            </ul>
+
+
+
+            <div class="dropdown pull-right site-nav-mobile">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#sebug-nav-mobile" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+                <ul id="sebug-nav-mobile" class="dropdown-menu" aria-labelledby="dLabel">
+
+                    <li><a class="login-link" href="/accounts/login/?next=/vuldb/vulnerabilities">登录</a></li>
+
+                    <li><a href="/">首页</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">悬赏与排名 <i class="fa fa-angle-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/vuldb/reward/detail">详情悬赏列表</a></li>
+                            <li><a href="/vuldb/reward/poc">PoC 悬赏列表</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="/exchange/goods">兑换</a></li>
+                            <li><a href="/hackers">排行榜</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="/contribute/vul">提交新漏洞</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                            aria-expanded="false">漏洞库 <i class="fa fa-angle-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/vuldb/vulnerabilities">漏洞列表</a></li>
+                            <li><a href="/appdir/">组件分类</a></li>
+                            <li><a href="/category/">漏洞分类</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/search/">搜索</a></li>
+
+                    <li><a href="/stat">数据统计</a></li>
+                    <li><a href="http://paper.seebug.org/" target="_blank">Paper</a></li>
+
+                </ul>
+            </div>
+
+
+
+        </div>
+    </header>
+
+
+    <style>
+        .c-filter-group-meta .filter-item {
+            width: 80px;
+            margin-left: 10px;
+        }
+    </style>
+    <div class="container" style="min-height: 700px;">
+        <div class="row">
+            <div class="col-md-12">
+                <form action="/vuldb/vulnerabilities">
+                    <div class="clearfix">
+                        <h2 class="page-title pull-left">漏洞列表</h2>
+                        <!-- <section class="pull-right search-form" style="margin-top: 32px;">
+                  <input id="J-key" type="text" name="keywords" class="form-control " value=""/>
+                  <i class="fa fa-search"></i>
+                </section> -->
+                    </div>
+
+                    <section class="clearfix" style="margin: 32px 0 20px;">
+
+                        <div class="pull-left">
+                            <!--排序 begin-->
+                            <div class="c-order-group">
+
+                                <a class="order-item order-asc" href="#">
+                                    <input type="hidden" name="order_time" value="1">
+
+                                    <span class="order-name">时间</span>
+                                    <span class="order-state"><i class="fa fa-angle-up"></i><i
+                                            class="fa fa-angle-down"></i></span>
+                                </a>
+                                <span class="divider"></span>
+
+                                <a class="order-item order-asc" href="#">
+                                    <input type="hidden" name="order_rank" value="1">
+
+                                    <span class="order-name">人气</span>
+                                    <span class="order-state"><i class="fa fa-angle-up"></i><i
+                                            class="fa fa-angle-down"></i></span>
+                                </a>
+                            </div>
+                            <!--排序 end-->
+                        </div>
+
+                        <div class="pull-right">
+                            <!--过滤器 begin-->
+                            <div class="c-filter-group">
+                                <div class="filter-item">
+                                    <span class="filter-name">漏洞类别：</span>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            All
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li class="search-wrapper">
+                                                <input type="text" name="category" placeholder="Search"
+                                                    class="j-autocomplete-vul-category" value="" />
+                                                <i class="fa fa-search"></i>
+                                            </li>
+
+
+
+                                        </ul>
+                                    </div>
+                                </div>
+                                <span class="divider"></span>
+                                <div class="filter-item j-filter-level">
+                                    <span class="filter-name">漏洞等级：</span>
+                                    <div class="dropdown">
+                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            All
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="javascript:;" data-value="high">高危</a></li>
+                                            <li><a href="javascript:;" data-value="middle">中危</a></li>
+                                            <li><a href="javascript:;" data-value="low">低危</a></li>
+                                            <li><a href="javascript:;" data-value="all">All</a></li>
+                                        </ul>
+                                        <input type="hidden" name="level" value="all">
+                                    </div>
+                                </div>
+                            </div>
+                            <!--过滤器 end-->
+                        </div>
+
+                    </section>
+                    <section class="clearfix" style="margin:20px 0 0px;padding: 0 10px;height: 72px;overflow: hidden;">
+                        <div class="pull-left">
+                            <div class="c-filter-group c-filter-group-date">
+                                <input type="hidden" name="submitTime" value="all">
+                                <div class="filter-item">
+                                    <a href="javascript:;" data-value="all" class="active">全部</a>
+                                </div>
+                                <span class="divider"></span>
+                                <div class="filter-item">
+                                    <a href="javascript:;" data-value="today">今天</a>
+                                </div>
+                                <span class="divider"></span>
+                                <div class="filter-item">
+                                    <a href="javascript:;" data-value="week">一周内</a>
+                                </div>
+                                <span class="divider"></span>
+                                <div class="filter-item">
+                                    <a href="javascript:;" data-value="month">一个月内</a>
+                                </div>
+                                <span class="divider"></span>
+                                <div class="filter-item">
+                                    <a href="javascript:;" data-value="year">半年内</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <div class="c-filter-group c-filter-group-meta">
+
+                                <div class="filter-item" style="width: 72px;">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_all" value="default" checked>
+                                            全不限
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_all" value="true">
+                                            不限
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_all" value="false">
+                                            全无
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="filter-item" style="width: 95px;">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_poc" value="default" checked>
+                                            不限 PoC
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_poc" value="true">
+                                            有 PoC
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_poc" value="false">
+                                            无 PoC
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="filter-item" style="width: 90px;">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_vm" value="default" checked>
+                                            不限靶场
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_vm" value="true">
+                                            有靶场
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_vm" value="false">
+                                            无靶场
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="filter-item" style="width:101px;">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_detail" value="default" checked>
+                                            不限详情
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_detail" value="true">
+                                            有详情
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_detail" value="false">
+                                            无详情
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="filter-item" style="width: 110px;">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_affect" value="default" checked>
+                                            不限影响图表
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_affect" value="true">
+                                            有影响图表
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="has_affect" value="false">
+                                            无影响图表
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+                </form>
+                <div class="table-responsive">
+
+
+                    <div class="table-responsive">
+                        <table class="table sebug-table table-vul-list">
+                            <thead>
+                                <tr>
+                                    <th>SSV ID</th>
+                                    <th class="text-center hidden-sm hidden-xs">提交时间</th>
+                                    <th class="text-center hidden-sm hidden-xs">漏洞等级</th>
+                                    <th>漏洞名称</th>
+                                    <th class="text-center hidden-sm hidden-xs">漏洞状态</th>
+                                    <th class="text-center hidden-sm hidden-md hidden-xs">人气 | 评论</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99847">SSV-99847</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-06-08</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Rejetto HTTP File Server 未授权 RCE（CVE-2024-23692）"
+                                            href="/vuldb/ssvid-99847">Rejetto HTTP File Server 未授权
+                                            RCE（CVE-2024-23692）</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-23692"></i>
+                                        <i class="fa fa-rocket " data-toggle="tooltip" data-original-title="有 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o " data-toggle="tooltip"
+                                            data-original-title="有详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">260 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99846">SSV-99846</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-06-08</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="PHPCGI 远程命令执行漏洞（CVE-2024-4577）" href="/vuldb/ssvid-99846">PHPCGI
+                                            远程命令执行漏洞（CVE-2024-4577）</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-4577"></i>
+                                        <i class="fa fa-rocket " data-toggle="tooltip" data-original-title="有 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">210 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99845">SSV-99845</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-06-05</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Apache OFBiz 目录遍历致代码执行漏洞(CVE-2024-36104)"
+                                            href="/vuldb/ssvid-99845">Apache OFBiz 目录遍历致代码执行漏洞(CVE-2024-36104)</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-36104"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">1249 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99844">SSV-99844</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-06-03</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Apache HugeGraph-Server Command Execution In Gremlin（CVE-2024-27348）"
+                                            href="/vuldb/ssvid-99844">Apache HugeGraph-Server Command Execution In
+                                            Gremlin（CVE-2024-27348）</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-27348"></i>
+                                        <i class="fa fa-rocket " data-toggle="tooltip" data-original-title="有 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">2081 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99843">SSV-99843</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-05-30</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Check Point Security Gateway 任意文件读取（CVE-2024-24919）"
+                                            href="/vuldb/ssvid-99843">Check Point Security Gateway
+                                            任意文件读取（CVE-2024-24919）</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-24919"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o " data-toggle="tooltip"
+                                            data-original-title="有详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">2585 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99842">SSV-99842</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-05-23</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level mid" data-toggle="tooltip" data-original-title="中危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Sonatype Nexus Repository 3路径遍历漏洞（CVE-2024-4956）"
+                                            href="/vuldb/ssvid-99842">Sonatype Nexus Repository
+                                            3路径遍历漏洞（CVE-2024-4956）</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-4956"></i>
+                                        <i class="fa fa-rocket " data-toggle="tooltip" data-original-title="有 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">3607 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99841">SSV-99841</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-05-22</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level mid" data-toggle="tooltip" data-original-title="中危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Zabbix 后台延时注入(CVE-2024-22120)" href="/vuldb/ssvid-99841">Zabbix
+                                            后台延时注入(CVE-2024-22120)</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-22120"></i>
+                                        <i class="fa fa-rocket " data-toggle="tooltip" data-original-title="有 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">3052 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99839">SSV-99839</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-05-22</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="WordPress-XStore-Core-Plugin-SQL-Injection(CVE-2024-33551)"
+                                            href="/vuldb/ssvid-99839">WordPress-XStore-Core-Plugin-SQL-Injection(CVE-2024-33551)</a>
+                                    </td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-33551"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">3322 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99838">SSV-99838</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-05-21</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title=" QNAP QTS 溢出导致的未授权 RCE 漏洞(CVE-2024-27130)" href="/vuldb/ssvid-99838">
+                                            QNAP QTS 溢出导致的未授权 RCE 漏洞(CVE-2024-27130)</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-27130"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o " data-toggle="tooltip"
+                                            data-original-title="有详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">3653 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99837">SSV-99837</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-05-17</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title" title="D-LINK DIR-X4860未授权 RCE"
+                                            href="/vuldb/ssvid-99837">D-LINK DIR-X4860未授权 RCE</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card  text-muted " data-toggle="tooltip"
+                                            data-original-title="无 CVE"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o " data-toggle="tooltip"
+                                            data-original-title="有详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">3661 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99836">SSV-99836</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-05-16</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Cacti 命令注入漏洞(CVE-2024-29895)" href="/vuldb/ssvid-99836">Cacti
+                                            命令注入漏洞(CVE-2024-29895)</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-29895"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">3730 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99835">SSV-99835</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-05-11</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Mura/Masa CMS SQL 注入漏洞( CVE-2024-32640)"
+                                            href="/vuldb/ssvid-99835">Mura/Masa CMS SQL 注入漏洞( CVE-2024-32640)</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-32640"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o " data-toggle="tooltip"
+                                            data-original-title="有详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">4183 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99834">SSV-99834</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-04-26</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title" title="禅道项目管理系统身份认证绕过漏洞"
+                                            href="/vuldb/ssvid-99834">禅道项目管理系统身份认证绕过漏洞</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card  text-muted " data-toggle="tooltip"
+                                            data-original-title="无 CVE"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">4543 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99833">SSV-99833</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-04-25</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="CrushFTP 认证绕过漏洞（CVE-2024-4040）" href="/vuldb/ssvid-99833">CrushFTP
+                                            认证绕过漏洞（CVE-2024-4040）</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-4040"></i>
+                                        <i class="fa fa-rocket " data-toggle="tooltip" data-original-title="有 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">4591 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99832">SSV-99832</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-04-25</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Primeton EOS Platform 反序列化致远程代码执行漏洞"
+                                            href="/vuldb/ssvid-99832">Primeton EOS Platform 反序列化致远程代码执行漏洞</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card  text-muted " data-toggle="tooltip"
+                                            data-original-title="无 CVE"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">3690 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99831">SSV-99831</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-04-24</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Progress Flowmon 命令注入漏洞（CVE-2024-2389）"
+                                            href="/vuldb/ssvid-99831">Progress Flowmon 命令注入漏洞（CVE-2024-2389）</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-2389"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o " data-toggle="tooltip"
+                                            data-original-title="有详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">3692 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99830">SSV-99830</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-04-19</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Oracle WebLogic Server 存在远程代码执行漏洞（CVE-2024-21006）"
+                                            href="/vuldb/ssvid-99830">Oracle WebLogic Server
+                                            存在远程代码执行漏洞（CVE-2024-21006）</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-21006"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o text-muted" data-toggle="tooltip"
+                                            data-original-title="无详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">4341 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99829">SSV-99829</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-04-17</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="Palo Alto Networks PAN-OS GlobalProtect 命令注入漏洞(CVE-2024-3400)"
+                                            href="/vuldb/ssvid-99829">Palo Alto Networks PAN-OS GlobalProtect
+                                            命令注入漏洞(CVE-2024-3400)</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-3400"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o " data-toggle="tooltip"
+                                            data-original-title="有详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">4059 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99828">SSV-99828</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-04-15</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title"
+                                            title="OpenMetadata 身份认证绕过漏洞与多个表达式注入漏洞(CVE-2024-28253、CVE-2024-28254、CVE-2024-28255、CVE-2024-28845、CVE-2024-28848)"
+                                            href="/vuldb/ssvid-99828">OpenMetadata
+                                            身份认证绕过漏洞与多个表达式注入漏洞(CVE-2024-28253、CVE-2024-28254、CVE-2024-28255、CVE-2024-28845、CVE-2024-28848)</a>
+                                    </td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card " data-toggle="tooltip"
+                                            data-original-title="CVE-2024-28253、CVE-2024-28254、CVE-2024-28255、CVE-2024-28845、CVE-2024-28848"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o " data-toggle="tooltip"
+                                            data-original-title="有详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">4074 | 0</td>
+                                </tr>
+
+                                <tr>
+                                    <td><a href="/vuldb/ssvid-99827">SSV-99827</a></td>
+                                    <td class="text-center datetime hidden-sm hidden-xs">2024-04-11</td>
+                                    <td class="text-center hidden-sm hidden-xs">
+                                        <div class="vul-level high" data-toggle="tooltip" data-original-title="高危"><span
+                                                class="step1"></span><span class="step2"></span><span
+                                                class="step3"></span>
+                                        </div>
+                                    </td>
+                                    <td class="vul-title-wrapper"><a class="vul-title" title="Linux内核n_gsm模块多个本地提权漏洞"
+                                            href="/vuldb/ssvid-99827">Linux内核n_gsm模块多个本地提权漏洞</a></td>
+                                    <td class="text-center hidden-sm hidden-xs ">
+                                        <i class="fa fa-id-card  text-muted " data-toggle="tooltip"
+                                            data-original-title="无 CVE"></i>
+                                        <i class="fa fa-rocket text-muted " data-toggle="tooltip"
+                                            data-original-title="无 PoC"></i>
+                                        <i class="fa fa-bullseye text-muted " data-toggle="tooltip"
+                                            data-original-title="无靶场"></i>
+                                        <i class="fa fa-file-text-o " data-toggle="tooltip"
+                                            data-original-title="有详情"></i>
+                                        <i class="fa fa-signal text-muted" data-toggle="tooltip"
+                                            data-original-title="无影响图表"></i>
+                                    </td>
+                                    <td class="text-center td-count hidden-sm hidden-xs hidden-md">4211 | 0</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                </div>
+
+
+                <nav class="text-center" style="margin-bottom: 30px;">
+
+
+
+                    <ul class="pagination">
+
+
+
+
+
+
+
+                        <li class="active"><a href="/vuldb/vulnerabilities?page=1">1</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=2">2</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=3">3</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=4">4</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=5">5</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=6">6</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=7">7</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=8">8</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=9">9</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=10">10</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=11">11</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        <li><span>...</span></li>
+                        <li><a href='/vuldb/vulnerabilities?page=2938'>2938</a></li>
+
+
+
+                        <li><a href="/vuldb/vulnerabilities?page=2" aria-label="Next"><span aria-hidden="true"><i
+                                        class="fa fa-chevron-right"></i></span></a></li>
+
+
+
+
+                    </ul>
+
+                    <form id="J-jump-form" class="form-page-jump" action="">
+                        跳转到: <input type="number" max="2938" />
+                        <a href="javascript:;">GO</a>
+                    </form>
+
+
+
+
+
+                </nav>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <style>
+        @media (min-width: 1200px) {
+            .container {
+                width: 1200px;
+            }
+        }
+    </style>
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <section class="nav-links">
+                        <div class="link-group">
+                            <div class="group-title">漏洞库</div>
+                            <ul class="list-unstyled">
+                                <li class="link-item"><a href="/vuldb/vulnerabilities">漏洞列表</a></li>
+                                <li class="link-item"><a href="/appdir/">组件分类</a></li>
+                                <li class="link-item"><a href="/category/">漏洞分类</a></li>
+                            </ul>
+                        </div>
+                        <div class="link-group" style="width:auto;">
+                            <div class="group-title">更多</div>
+                            <ul class="list-unstyled">
+                                <li class="link-item"><a href="/vuldb/reward/poc">悬赏列表</a></li>
+
+                                <li class="link-item"><a href="/hackers">排行榜</a></li>
+                                <!-- <li class="link-item"><a href="http://ceye.io">Ceye</a></li>
+              <li class="link-item"><a href="http://paper.seebug.org/">Paper</a></li> -->
+                            </ul>
+                        </div>
+                        <div class="link-group">
+                            <div class="group-title">帮助</div>
+                            <ul class="list-unstyled">
+                                <li class="link-item"><a href="/help/about">关于</a></li>
+                                <li class="link-item"><a href="/help/user_level">相关说明</a></li>
+                                <li class="link-item"><a href="/help/vul">漏洞定义</a></li>
+                                <li class="link-item"><a href="/help/reward">奖励计划</a></li>
+                            </ul>
+                        </div>
+                        <div class="link-group">
+                            <div class="group-title">联系我们</div>
+                            <ul class="list-unstyled">
+                                <li class="link-item phone"><span>010-57076191</span></li>
+                                <li class="link-item email"><span>s1@seebug.org</span></li>
+                                <li class="link-item address"><span>北京市 朝阳区 阜安西路 望京SOHO中心 T3-A座-15层</span></li>
+                            </ul>
+                        </div>
+                        <div class="link-group">
+                            <div class="group-title">Public links</div>
+                            <ul class="list-unstyled">
+                                <li class="link-item"><a href="https://www.knownsec.com/#/">Knownsec</a></li>
+                                <li class="link-item"><a href="https://www.yunaq.com/cyd/?from=cj_cyd_sbug">创宇盾</a></li>
+                                <li class="link-item"><a href="https://mg.yunaq.com/#/?from=seebuglink">创宇蜜罐-诱捕溯源</a>
+                                </li>
+                                <li class="link-item"><a href="https://www.scanv.com/?from=seebug">ScanV (云监测)</a></li>
+                                <li class="link-item"><a href="http://hackernews.cc/">hackernews</a></li>
+                            </ul>
+                        </div>
+                    </section>
+                    <div class="follow-seebug">
+                        <div class="title">关注我们</div>
+                        <div class="links">
+                            <a class="link-weixin" href="#"><i class="fa fa-weixin"></i></a>
+                            <a class="link-qq" target="_blank"
+                                href="http://shang.qq.com/wpa/qunwpa?idkey=776f4a26f510d0c79b003767fe5421ca07c70ad45fdd677e9b1e0c827845e331"><i
+                                    class="fa fa-qq"></i></a>
+                            <a class="link-weibo" target="_blank" href="http://weibo.com/sebug0net"><i
+                                    class="fa fa-weibo"></i></a>
+                            <a class="link-twi" target="_blank" href="https://twitter.com/seebug_team"><i
+                                    class="fa fa-twitter"></i></a>
+                            <a class="link-facebook" target="_blank" href="mailto:s1@seebug.org"><i
+                                    class="fa fa-envelope"></i></a>
+                        </div>
+                        <br>
+                        <br>
+
+                        <div>
+                            <a target="_blank"
+                                href="https://v.yunaq.com/certificate?domain=www.seebug.org&amp;from=label">
+                                <img height="30" src="https://aqyzmedia.yunaq.com/labels/label_sm_90040.png">
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="ksz-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="logo-wrapper">
+                        <a target="_blank" href="http://kcon.knownsec.com/"><img
+                                src="/static/dist2/images/ksz-kcon-new.svg" alt="" style="height: 28px;" /></a>
+                    </div>
+                    <div class="logo-wrapper">
+                        <a href="/"><img src="/static/dist2/images/seebug-logo2023.png" alt=""
+                                style="height: 28px;" /></a>
+                    </div>
+                    <div class="logo-wrapper">
+                        <a target="_blank" href="https://www.zoomeye.org/"><img
+                                src="/static/dist2/images/ksz-zoomeye.svg" alt="" style="height: 20px;" /></a>
+                    </div>
+                    <div class="logo-wrapper">
+                        <a target="_blank" href="https://www.yunaq.com/?from=sbg0702"><img
+                                src="/static/dist2/images/yunaq-logo.png" alt="" style="height: 28px;" /></a>
+                    </div>
+                    <div class="copyright-text">
+                        <a target="_blank" href="https://beian.miit.gov.cn/" style="padding-right: 10px; color: #aaa">
+                            京ICP备10040895号
+                        </a>
+                        <a target="_blank"
+                            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11010502034610"
+                            style="padding-right: 10px; color: #aaa">
+                            <img src="/static/dist2/images/beian.png">
+                            京公网安备 11010502034610号
+                        </a>
+                        Copyright @ 404 Team from Knownsec.
+
+                        <a class="language" href="/accounts/language/?l=en">English</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="modal fade" id="renew-vip">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="border-bottom: none">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" style="color:#aaaaaa;padding-top: 30px;font-weight: normal;">您好，<span
+                            style="color: #000000"></span></h4>
+                </div>
+                <div class="modal-body text-center">
+                    <p style="color:#666666;line-height: 40px;">续费请拨打客服热线，感谢您一直支持 Seebug!</p>
+
+                    <div
+                        style="display:inline-block;font-size: 40px;color: #b2976a;background:#f4f4f4; padding:6px 40px;border-radius: 33px;">
+                        <i class="fa fa-phone"></i> 010-57076191
+                    </div>
+                    <br />
+                    <img src="/static/dist2/images/logo-gray-sm.png" style="margin: 20px;" alt="" />
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <script src="/static/dist/script/jquery.min.js"></script>
+    <script src="/static/dist2/scripts/vendor.js"></script>
+    <script src="/static/dist2/scripts/plugins.js"></script>
+    <script src="/static/dist2/scripts/index_serch.js"></script>
+    <script src="/static/dist2/scripts/main.js?v=201811"></script>
+
+
+
+    <link rel="stylesheet" href="/static/dist2/vendor/awesomplete/awesomplete.css" />
+    <script src="/static/dist2/vendor/awesomplete/awesomplete.js"></script>
+    <script>
+        $(function () {
+
+            // 下拉列表 选择漏洞分类
+            var input = $('.j-autocomplete-vul-category')[0];
+            var awesomplete = new Awesomplete(input, {
+                minChars: 1,
+                list: SB.VUL_CATEGORYS
+            });
+            awesomplete.input.addEventListener('awesomplete-selectcomplete', function (e) {
+                var $me = $(e.target);
+                $me.parents('.dropdown').find('.dropdown-toggle').html($me.val() + ' <span class="caret"></span>');
+                $me.parents('form').submit()
+            })
+            // 下拉列表 选择漏洞等级
+            $('.j-filter-level').on('click', '[data-value]', function () {
+                var $me = $(this);
+                var $wrapper = $me.parents('.dropdown');
+                $wrapper.find('input').val($me.data('value'))
+                $wrapper.find('.dropdown-toggle').html($me.html() + ' <span class="caret"></span>');
+                $me.parents('form').submit()
+            })
+            // 排序按钮
+            $('.c-order-group').on('click', '.order-item', function () {
+                var $me = $(this);
+                var $input = $me.find('input')
+                if ($me.hasClass('order-asc')) {
+                    $me.removeClass('order-asc').addClass('order-desc')
+                    $input.val('0')
+                } else {
+                    $me.removeClass('order-desc').addClass('order-asc')
+                    $input.val('1')
+                }
+                $me.parents('form').submit()
+            })
+            // 选择漏洞更新时间
+            $('.c-filter-group-date').on('click', '[data-value]', function () {
+                var $me = $(this);
+                var $wrapper = $me.parents('.c-filter-group-date');
+                $wrapper.find('[data-value]').removeClass('active');
+                $me.addClass('active');
+                $wrapper.find('input').val($me.data('value'));
+                $me.parents('form').submit()
+            })
+
+            // 漏洞类型 radio选中的排第一
+            function checkedBeFirst() {
+                $('.filter-item', '.c-filter-group-meta').each(function () {
+                    var $checkedRadio = $(this).find('input:checked').parents('.radio');
+                    $checkedRadio.after($checkedRadio.siblings());
+                })
+            }
+
+            checkedBeFirst();
+
+
+
+            // 单选框 漏洞状态
+            $('.c-filter-group-meta').on('click', 'input[type=radio]', function () {
+                var $me = $(this);
+                if ($me.attr('name') == 'has_all') {
+                    $me.parents('.c-filter-group-meta').find('input:gt(1)').each(function (index, item) {
+                        if (item.value == $me.val()) {
+                            item.checked = !0;
+                        } else {
+                            item.checked = !1;
+                        }
+                    })
+                }
+                $me.parents('form').submit()
+            });
+
+            // // 输入关键字
+            $('#J-key').on('keyup', function (e) {
+                var $me = $(this);
+                var input = String.prototype.trim.call($me.val())
+                if (e.keyCode == 13) {
+                    if (input == '') return !1;
+                    $me.parents('form').submit()
+                }
+            })
+
+        })
+    </script>
+
+
+</body>
+
+</html>

@@ -7,6 +7,7 @@ extend-exclude = [
     "notebooks/*",
     "config/development.yaml",
     "migration",
+    "fixtures/*",
 ]
 
 [default.extend-identifiers]
