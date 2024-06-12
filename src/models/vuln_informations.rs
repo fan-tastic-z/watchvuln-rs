@@ -89,6 +89,8 @@ impl super::_entities::vuln_informations::Model {
                 vuln_model.from = ActiveValue::set(vuln.from);
                 vuln_model.reasons = ActiveValue::set(Some(vuln.reasons));
                 vuln_model.is_valuable = ActiveValue::set(vuln.is_valuable);
+                // if tags or severtiy update should set pushed false, repush
+                vuln_model.pushed = ActiveValue::set(false);
                 let m = vuln_model.update(&txn).await?;
                 txn.commit().await?;
                 return Ok(m);

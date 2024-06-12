@@ -46,18 +46,9 @@ impl WatchVulnApp {
         WatchVulnApp { app_context, grabs }
     }
 
-    pub async fn run(&self) -> Result<()> {
-        let self_arc = Arc::new(self.clone());
-
-        // init data
-        self_arc.crawling_task(true).await;
-        let local_count = vuln_informations::Model::query_count(&self.app_context.db).await?;
-        info!("init finished, local database has {} vulns", local_count);
-        self.push_init_msg(local_count).await?;
-
-        let sched = JobScheduler::new().await?;
+    fn crawling_job(&self) -> Result<Job> {
         let schedule = self.app_context.config.task.cron_config.as_str();
-
+        let self_arc = Arc::new(self.clone());
         let job = Job::new_async_tz(
             schedule,
             chrono_tz::Asia::Shanghai,
@@ -77,6 +68,20 @@ impl WatchVulnApp {
                 })
             },
         )?;
+        Ok(job)
+    }
+
+    pub async fn run(&self) -> Result<()> {
+        let self_arc = Arc::new(self.clone());
+
+        // init data
+        self_arc.crawling_task(true).await;
+        let local_count = vuln_informations::Model::query_count(&self.app_context.db).await?;
+        info!("init finished, local database has {} vulns", local_count);
+        self.push_init_msg(local_count).await?;
+
+        let sched = JobScheduler::new().await?;
+        let job = self.crawling_job()?;
 
         sched.add(job).await?;
         sched.start().await?;
