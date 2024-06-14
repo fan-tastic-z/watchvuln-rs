@@ -86,7 +86,8 @@ pub fn init(config: &config::Logger) {
     let timer = OffsetTime::new(offset!(+8), time_fmt);
     let builder = tracing_subscriber::FmtSubscriber::builder()
         .with_env_filter(filter)
-        .with_timer(timer);
+        .with_timer(timer)
+        .with_line_number(true);
 
     match config.format {
         Format::Compact => builder.compact().init(),

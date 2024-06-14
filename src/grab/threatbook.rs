@@ -130,7 +130,7 @@ pub struct HighRisk {
     pub vuln_name_zh: String,
     pub vuln_update_time: String,
     pub affects: Vec<String>,
-    pub vuln_publish_time: String,
+    pub vuln_publish_time: Option<String>,
     #[serde(rename = "pocExist")]
     pub poc_exist: bool,
     pub solution: bool,
