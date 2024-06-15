@@ -1,5 +1,3 @@
-use std::usize;
-
 use async_trait::async_trait;
 use chrono::{DateTime, FixedOffset};
 use reqwest::header::{self};

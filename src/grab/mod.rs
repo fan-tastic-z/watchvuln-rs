@@ -44,25 +44,13 @@ impl From<Model> for VulnInfo {
             _ => Severity::Low,
         };
 
-        let references = match v.references {
-            Some(references) => references,
-            None => Vec::new(),
-        };
+        let references = v.references.unwrap_or_default();
 
-        let tags = match v.tags {
-            Some(tags) => tags,
-            None => Vec::new(),
-        };
+        let tags = v.tags.unwrap_or_default();
 
-        let reasons = match v.reasons {
-            Some(reasons) => reasons,
-            None => Vec::new(),
-        };
+        let reasons = v.reasons.unwrap_or_default();
 
-        let github_search = match v.github_search {
-            Some(github_search) => github_search,
-            None => Vec::new(),
-        };
+        let github_search = v.github_search.unwrap_or_default();
 
         VulnInfo {
             unique_key: v.key,
