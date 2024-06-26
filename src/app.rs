@@ -1,8 +1,9 @@
 use lazy_static::lazy_static;
 use migration::MigratorTrait;
 use sea_orm::DatabaseConnection;
+use snafu::ResultExt;
 use std::{collections::HashMap, sync::Arc, time::Duration};
-use tokio::{task::JoinSet, time};
+use tokio::{runtime::Runtime, task::JoinSet, time};
 use tokio_cron_scheduler::{Job, JobScheduler};
 use tracing::{info, warn};
 
@@ -10,8 +11,8 @@ use crate::{
     config::Config,
     db,
     environment::Environment,
-    error::Result,
-    grab::{self, Grab},
+    error::{CronSchedulerErrSnafu, DbErrSnafu, Result},
+    grab::{self, Grab, VulnInfo},
     models::_entities::vuln_informations::{self, Model},
     push::{
         self,
@@ -55,9 +56,17 @@ impl WatchVulnApp {
             move |uuid, mut lock| {
                 let self_clone = self_arc.clone();
                 Box::pin(async move {
-                    let res = self_clone.crawling_task(false).await;
+                    let res: Vec<VulnInfo> = self_clone
+                        .crawling_task(false)
+                        .await
+                        .into_iter()
+                        .map(|x| x.into())
+                        .collect();
                     info!("crawling over all count is: {}", res.len());
-                    self_clone.push(res).await;
+                    let rt1 = Runtime::new().unwrap();
+                    rt1.block_on(async move {
+                        self_clone.push(res).await;
+                    });
                     let next_tick = lock.next_tick_for_job(uuid).await;
                     if let Ok(Some(tick)) = next_tick {
                         info!(
@@ -67,7 +76,8 @@ impl WatchVulnApp {
                     }
                 })
             },
-        )?;
+        )
+        .context(CronSchedulerErrSnafu)?;
         Ok(job)
     }
 
@@ -80,11 +90,11 @@ impl WatchVulnApp {
         info!("init finished, local database has {} vulns", local_count);
         self.push_init_msg(local_count).await?;
 
-        let sched = JobScheduler::new().await?;
+        let sched = JobScheduler::new().await.context(CronSchedulerErrSnafu)?;
         let job = self.crawling_job()?;
 
-        sched.add(job).await?;
-        sched.start().await?;
+        sched.add(job).await.context(CronSchedulerErrSnafu)?;
+        sched.start().await.context(CronSchedulerErrSnafu)?;
         loop {
             time::sleep(Duration::from_secs(60)).await;
         }
@@ -96,48 +106,52 @@ impl WatchVulnApp {
         for v in self.grabs.as_ref().values() {
             let grab = v.to_owned();
             if is_init {
-                set.spawn(async move { grab.get_update(INIT_PAGE_LIMIT).await });
+                // set.spawn(async move { grab.get_update(INIT_PAGE_LIMIT).await });
+                set.spawn(async move {
+                    grab.get_update(INIT_PAGE_LIMIT)
+                        .await
+                        .expect("crawling error")
+                });
             } else {
-                set.spawn(async move { grab.get_update(PAGE_LIMIT).await });
+                set.spawn(
+                    async move { grab.get_update(PAGE_LIMIT).await.expect("crawling error") },
+                );
             }
         }
         let mut new_vulns = Vec::new();
         while let Some(set_res) = set.join_next().await {
             match set_res {
-                Ok(grabs_res) => match grabs_res {
-                    Ok(res) => {
-                        for v in res {
-                            let create_res =
-                                vuln_informations::Model::creat_or_update(&self.app_context.db, v)
-                                    .await;
-                            match create_res {
-                                Ok(m) => {
-                                    info!("found new vuln:{}", m.key);
-                                    new_vulns.push(m)
-                                }
-                                Err(e) => {
-                                    warn!("db model error:{}", e);
-                                }
+                Ok(grabs_res) => {
+                    for v in grabs_res {
+                        let create_res =
+                            vuln_informations::Model::creat_or_update(&self.app_context.db, v)
+                                .await;
+                        match create_res {
+                            Ok(m) => {
+                                info!("found new vuln:{}", m.key);
+                                new_vulns.push(m)
+                            }
+                            Err(e) => {
+                                warn!("db model error:{:?}", e);
                             }
                         }
                     }
-                    Err(err) => warn!("grab crawling error:{}", err),
-                },
-                Err(e) => warn!("join set error:{}", e),
+                }
+                Err(e) => warn!("join set error:{:?}", e),
             }
         }
         new_vulns
     }
 
-    async fn push(&self, vulns: Vec<Model>) {
+    async fn push(&self, vulns: Vec<VulnInfo>) {
         for mut vuln in vulns.into_iter() {
             if vuln.is_valuable {
                 if vuln.pushed {
-                    info!("{} has been pushed, skipped", vuln.key);
+                    info!("{} has been pushed, skipped", vuln.unique_key);
                     continue;
                 }
 
-                let key = vuln.key.clone();
+                let key = vuln.unique_key.clone();
                 let title = vuln.title.clone();
                 if !vuln.cve.is_empty() && self.app_context.config.github_search {
                     let links = search_github_poc(&vuln.cve).await;
@@ -150,15 +164,15 @@ impl WatchVulnApp {
                         )
                         .await
                         {
-                            warn!("update vuln {} github_search error: {}", &vuln.cve, err);
+                            warn!("update vuln {} github_search error: {:?}", &vuln.cve, err);
                         }
-                        vuln.github_search = Some(links);
+                        vuln.github_search = links;
                     }
                 }
-                let msg = match reader_vulninfo(vuln.into()) {
+                let msg = match reader_vulninfo(vuln) {
                     Ok(msg) => msg,
                     Err(err) => {
-                        warn!("reader vulninfo {} error {}", key, err);
+                        warn!("reader vulninfo {} error {:?}", key, err);
                         continue;
                     }
                 };
@@ -169,7 +183,7 @@ impl WatchVulnApp {
                         vuln_informations::Model::update_pushed_by_key(&self.app_context.db, key)
                             .await
                     {
-                        warn!("update vuln {} pushed error: {}", msg, err);
+                        warn!("update vuln {} pushed error: {:?}", msg, err);
                     }
                 }
             }
@@ -205,28 +219,27 @@ impl WatchVulnApp {
             let bot_clone = bot.clone();
             let message = msg.clone();
             let title = title.clone();
-            set.spawn(async move { bot_clone.push_markdown(title, message).await });
+            set.spawn(async move {
+                bot_clone
+                    .push_markdown(title, message)
+                    .await
+                    .expect("push markdown error")
+            });
         }
         let mut is_push = true;
         while let Some(set_res) = set.join_next().await {
-            match set_res {
-                Ok(res) => {
-                    if let Err(e) = res {
-                        is_push = false;
-                        warn!("push message error:{}", e);
-                    }
-                }
-                Err(err) => {
-                    is_push = false;
-                    warn!("push join set error:{}", err)
-                }
+            if set_res.is_err() {
+                is_push = false;
+                warn!("push message error: {:?}", set_res.err());
             }
         }
         is_push
     }
 
     pub async fn run_migration(&self) -> Result<()> {
-        migration::Migrator::up(&self.app_context.db, None).await?;
+        migration::Migrator::up(&self.app_context.db, None)
+            .await
+            .context(DbErrSnafu)?;
         Ok(())
     }
 }
@@ -241,7 +254,7 @@ pub struct AppContext {
 
 pub async fn create_context(environment: &Environment) -> Result<AppContext> {
     let config = environment.load()?;
-    let db = db::connect(&config.database).await?;
+    let db = db::connect(&config.database).await.context(DbErrSnafu)?;
     let bot_manager = push::init(config.clone());
     Ok(AppContext {
         environment: environment.clone(),

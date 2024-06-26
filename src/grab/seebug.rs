@@ -1,10 +1,13 @@
 use async_trait::async_trait;
-use eyre::eyre;
 use reqwest::header::{self};
 use scraper::{ElementRef, Html, Selector};
+use snafu::{ensure, OptionExt, ResultExt};
 use tracing::{info, warn};
 
-use crate::error::{Error, Result};
+use crate::error::{
+    ElementAttrErrSnafu, InvalidSeebugPageNumSnafu, ParseIntErrSnafu, ParseSeeBugHtmlErrSnafu,
+    Result, SelectNthErrSnafu, SelectorSnafu,
+};
 use crate::grab::{Severity, VulnInfo};
 use crate::utils::http_client::Help;
 
@@ -55,71 +58,71 @@ impl SeeBugCrawler {
 
     pub async fn get_page_count(&self) -> Result<i32> {
         let document = self.get_document(SEEBUG_LIST_URL).await?;
-        let selector = Selector::parse("ul.pagination li a")
-            .map_err(|err| eyre!("parse html error {}", err))?;
+        let selector = Selector::parse("ul.pagination li a").context(SelectorSnafu)?;
         let page_nums = document
             .select(&selector)
             .map(|el| el.inner_html())
             .collect::<Vec<_>>();
-        if page_nums.len() < 3 {
-            return Err(Error::Message(
-                "failed to get seebug pagination node".to_owned(),
-            ));
-        }
-        let total = page_nums[page_nums.len() - 1 - 1].parse::<i32>()?;
+        ensure!(
+            page_nums.len() >= 3,
+            InvalidSeebugPageNumSnafu {
+                num: page_nums.len()
+            }
+        );
+        let total_str = &page_nums[page_nums.len() - 1 - 1];
+        let total = total_str
+            .parse::<i32>()
+            .with_context(|_| ParseIntErrSnafu { num: total_str })?;
         Ok(total)
     }
 
     pub async fn parse_page(&self, page: i32) -> Result<Vec<VulnInfo>> {
         let url = format!("{}?page={}", SEEBUG_LIST_URL, page);
         let document = self.get_document(&url).await?;
-        let selector = Selector::parse(".sebug-table tbody tr")
-            .map_err(|err| eyre!("seebug parse html error {}", err))?;
+        let selector = Selector::parse(".sebug-table tbody tr").context(SelectorSnafu)?;
         let tr_elements = document.select(&selector).collect::<Vec<_>>();
-        if tr_elements.is_empty() {
-            return Err(Error::Message("failed to get seebug page".into()));
-        }
+        ensure!(tr_elements.is_empty(), ParseSeeBugHtmlErrSnafu,);
         let mut res = Vec::with_capacity(tr_elements.len());
         for el in tr_elements {
             let (href, unique_key) = match self.get_href(el) {
                 Ok((href, unique_key)) => (href, unique_key),
                 Err(e) => {
-                    warn!("seebug get href error {}", e);
+                    warn!("seebug get href error {:?}", e);
                     continue;
                 }
             };
             let disclosure = match self.get_disclosure(el) {
                 Ok(disclosure) => disclosure,
                 Err(e) => {
-                    warn!("seebug get disclosure error {}", e);
+                    warn!("seebug get disclosure error {:?}", e);
                     continue;
                 }
             };
             let severity_title = match self.get_severity_title(el) {
                 Ok(severity_title) => severity_title,
                 Err(e) => {
-                    warn!("seebug get severity title error {}", e);
+                    warn!("seebug get severity title error {:?}", e);
                     continue;
                 }
             };
             let title = match self.get_title(el) {
                 Ok(title) => title,
                 Err(e) => {
-                    warn!("seebug get title error {}", e);
+                    warn!("seebug get title error {:?}", e);
                     continue;
                 }
             };
             let cve_id = match self.get_cve_id(el) {
                 Ok(cve_id) => cve_id,
                 Err(e) => {
-                    warn!("seebug get cve_id error {}", e);
+                    warn!("seebug get cve_id error {:?}", e);
                     "".to_string()
                 }
             };
             let tag = match self.get_tag(el) {
                 Ok(tag) => tag,
                 Err(e) => {
-                    warn!("seebug get tag error {}", e);
+                    warn!("seebug get tag error {:?}", e);
                     continue;
                 }
             };
@@ -145,6 +148,7 @@ impl SeeBugCrawler {
                 reasons: vec![],
                 github_search: vec![],
                 is_valuable,
+                pushed: false,
             };
             res.push(data);
         }
@@ -167,15 +171,17 @@ impl SeeBugCrawler {
     }
 
     fn get_href(&self, el: ElementRef) -> Result<(String, String)> {
-        let selector = Selector::parse("td a").map_err(|err| eyre!("parse html error {}", err))?;
+        let selector = Selector::parse("td a").context(SelectorSnafu)?;
         let a_element = el
             .select(&selector)
             .nth(0)
-            .ok_or_else(|| eyre!("value not found"))?;
+            .with_context(|| SelectNthErrSnafu { nth: 0_usize })?;
         let href = a_element
             .value()
             .attr("href")
-            .ok_or_else(|| eyre!("href not found"))?
+            .with_context(|| ElementAttrErrSnafu {
+                attr: "href".to_string(),
+            })?
             .trim();
         let href = format!("https://www.seebug.org{}", href);
         let binding = a_element.inner_html();
@@ -184,73 +190,75 @@ impl SeeBugCrawler {
     }
 
     fn get_disclosure(&self, el: ElementRef) -> Result<String> {
-        let selector = Selector::parse("td").map_err(|err| eyre!("parse html error {}", err))?;
+        let selector = Selector::parse("td").context(SelectorSnafu)?;
         let disclosure = el
             .select(&selector)
             .nth(1)
-            .ok_or_else(|| eyre!("value not found"))?
+            .with_context(|| SelectNthErrSnafu { nth: 1_usize })?
             .inner_html();
 
         Ok(disclosure)
     }
 
     fn get_severity_title(&self, el: ElementRef) -> Result<String> {
-        let selector =
-            Selector::parse("td div").map_err(|err| eyre!("parse html error {}", err))?;
+        let selector = Selector::parse("td div").context(SelectorSnafu)?;
         let td_element = el
             .select(&selector)
             .nth(0)
-            .ok_or_else(|| eyre!("severity_title div not found"))?;
+            .with_context(|| SelectNthErrSnafu { nth: 0_usize })?;
         let severity_title = td_element
             .value()
             .attr("data-original-title")
-            .ok_or_else(|| eyre!("href not found"))?
+            .with_context(|| ElementAttrErrSnafu {
+                attr: "data-original-title".to_string(),
+            })?
             .trim();
         Ok(severity_title.to_owned())
     }
 
     fn get_title(&self, el: ElementRef) -> Result<String> {
-        let selector = Selector::parse("td a[class='vul-title']")
-            .map_err(|err| eyre!("parse html error {}", err))?;
+        let selector = Selector::parse("td a[class='vul-title']").context(SelectorSnafu)?;
         let title = el
             .select(&selector)
             .nth(0)
-            .ok_or_else(|| eyre!("title not found"))?
+            .with_context(|| SelectNthErrSnafu { nth: 0_usize })?
             .inner_html();
         Ok(title)
     }
 
     fn get_cve_id(&self, el: ElementRef) -> Result<String> {
-        let selector = Selector::parse("td i[class='fa fa-id-card ']")
-            .map_err(|err| eyre!("parse html error {}", err))?;
+        let selector = Selector::parse("td i[class='fa fa-id-card ']").context(SelectorSnafu)?;
         let cve_ids = el
             .select(&selector)
             .nth(0)
-            .ok_or_else(|| eyre!("cve id element not found"))?
+            .with_context(|| SelectNthErrSnafu { nth: 0_usize })?
             .value()
             .attr("data-original-title")
-            .ok_or_else(|| eyre!("data-original-title not found"))?
+            .with_context(|| ElementAttrErrSnafu {
+                attr: "data-original-title".to_string(),
+            })?
             .trim();
         if cve_ids.contains('、') {
             return Ok(cve_ids
                 .split('、')
                 .nth(0)
-                .ok_or_else(|| eyre!("cve_ids split not found cve id"))?
+                .with_context(|| SelectNthErrSnafu { nth: 0_usize })?
                 .to_owned());
         }
         Ok(cve_ids.to_string())
     }
 
     fn get_tag(&self, el: ElementRef) -> Result<String> {
-        let selector = Selector::parse("td .fa-file-text-o")
-            .map_err(|err| eyre!("parse html error {}", err))?;
+        let selector = Selector::parse("td .fa-file-text-o").context(SelectorSnafu)?;
         let tag = el
             .select(&selector)
             .nth(0)
-            .ok_or_else(|| eyre!("tag element not found"))?
+            .with_context(|| SelectNthErrSnafu { nth: 0_usize })?
             .value()
             .attr("data-original-title")
-            .ok_or_else(|| eyre!("tag data-original-title not found"))?
+            .with_context(|| ElementAttrErrSnafu {
+                attr: "data-original-title".to_string(),
+            })?
             .trim();
         Ok(tag.to_string())
     }
@@ -258,46 +266,34 @@ impl SeeBugCrawler {
 
 #[cfg(test)]
 mod tests {
+    use crate::error::IoSnafu;
+
     use super::*;
     use std::fs;
 
-    #[tokio::test]
-    async fn test_seebug_get_cve() -> Result<()> {
+    fn get_first_element_cve(path: &str) -> Result<String> {
         let seebug = SeeBugCrawler::new();
-        // read fixtures/seebug.html
-        let html = fs::read_to_string("fixtures/seebug.html")?;
+        let html = fs::read_to_string(path).context(IoSnafu)?;
         let document = Html::parse_document(&html);
-        let selector = Selector::parse(".sebug-table tbody tr")
-            .map_err(|err| eyre!("seebug parse html error {}", err))?;
+        let selector = Selector::parse(".sebug-table tbody tr").context(SelectorSnafu)?;
         let tr_elements = document.select(&selector).collect::<Vec<_>>();
-        if tr_elements.is_empty() {
-            return Err(Error::Message("failed to get seebug page".into()));
-        }
-        let first = tr_elements
-            .first()
-            .ok_or_else(|| Error::Message("failed to get seebug page first element".to_string()))?
-            .to_owned();
+
+        ensure!(!tr_elements.is_empty(), ParseSeeBugHtmlErrSnafu);
+        let first = tr_elements[0].to_owned();
         let cve_id = seebug.get_cve_id(first)?;
+        Ok(cve_id)
+    }
+
+    #[test]
+    fn test_seebug_get_cve() -> Result<()> {
+        let cve_id = get_first_element_cve("fixtures/seebug.html")?;
         assert_eq!(cve_id, "CVE-2024-23692");
         Ok(())
     }
-    #[tokio::test]
-    async fn test_many_cve_seebug_get_cve() -> Result<()> {
-        let seebug = SeeBugCrawler::new();
-        // read fixtures/seebug.html
-        let html = fs::read_to_string("fixtures/seebug_many_cve.html")?;
-        let document = Html::parse_document(&html);
-        let selector = Selector::parse(".sebug-table tbody tr")
-            .map_err(|err| eyre!("seebug parse html error {}", err))?;
-        let tr_elements = document.select(&selector).collect::<Vec<_>>();
-        if tr_elements.is_empty() {
-            return Err(Error::Message("failed to get seebug page".into()));
-        }
-        let first = tr_elements
-            .first()
-            .ok_or_else(|| Error::Message("failed to get seebug page first element".to_string()))?
-            .to_owned();
-        let cve_id = seebug.get_cve_id(first)?;
+    #[test]
+    fn test_many_cve_seebug_get_cve() -> Result<()> {
+        let cve_id = get_first_element_cve("fixtures/seebug_many_cve.html")?;
+
         assert_eq!(cve_id, "CVE-2023-50445");
         Ok(())
     }

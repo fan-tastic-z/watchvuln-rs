@@ -1,12 +1,14 @@
 use crate::{
-    error::{Error, Result},
+    error::{HttpClientErrSnafu, RegexCapturesErrSnafu, RegexErrSnafu, Result},
     utils::data_str_format,
 };
 use async_trait::async_trait;
+
 use regex::Regex;
 use reqwest::header;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use snafu::{OptionExt, ResultExt};
 use tracing::{info, warn};
 
 use crate::utils::http_client::Help;
@@ -41,7 +43,7 @@ impl Grab for AntiCrawler {
             let unique_key = match cve {
                 Ok(unique_key) => unique_key,
                 Err(e) => {
-                    warn!("AntiCrawler get update not found cve error:{}", e);
+                    warn!("AntiCrawler get update not found cve error:{:?}", e);
                     continue;
                 }
             };
@@ -65,6 +67,7 @@ impl Grab for AntiCrawler {
                 reasons: vec![],
                 github_search: vec![],
                 is_valuable: true,
+                pushed: false,
             };
             res.push(vuln);
         }
@@ -116,12 +119,15 @@ impl AntiCrawler {
                 "time_range":[]
             }
         });
-        let anti_response: AntiResponse = self
-            .help
-            .post_json(ANTI_LIST_URL, &params)
-            .await?
-            .json()
-            .await?;
+
+        let post_json_res = self.help.post_json(ANTI_LIST_URL, &params).await?;
+        let anti_response: AntiResponse =
+            post_json_res
+                .json()
+                .await
+                .with_context(|_| HttpClientErrSnafu {
+                    url: ANTI_LIST_URL.to_string(),
+                })?;
         Ok(anti_response)
     }
 
@@ -161,12 +167,15 @@ impl AntiCrawler {
     }
 
     fn get_cve(&self, title: &str) -> Result<String> {
-        let res = Regex::new(ANTI_CVEID_REGEXP)?.captures(title);
-        if let Some(cve) = res {
-            Ok(cve[0].to_string())
-        } else {
-            Err(Error::Message("cve regex match not found".to_owned()))
-        }
+        let res = Regex::new(ANTI_CVEID_REGEXP)
+            .with_context(|_| RegexErrSnafu {
+                re: ANTI_CVEID_REGEXP,
+            })?
+            .captures(title)
+            .with_context(|| RegexCapturesErrSnafu {
+                msg: format!("captures title:{} cve not found", title),
+            })?;
+        Ok(res[0].to_string())
     }
 }
 

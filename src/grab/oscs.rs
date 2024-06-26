@@ -2,10 +2,11 @@ use async_trait::async_trait;
 use chrono::{DateTime, FixedOffset};
 use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
+use snafu::{ensure, ResultExt};
 use tracing::{error, info};
 
 use crate::{
-    error::{Error, Result},
+    error::{HttpClientErrSnafu, InvalidOscsDetailSnafu, InvalidOscsListTotalSnafu, Result},
     grab::{Severity, VulnInfo},
     utils::{http_client::Help, timestamp_to_date},
 };
@@ -64,12 +65,11 @@ impl OscCrawler {
             "page": page,
             "per_page": per_page,
         });
-        let oscs_list_resp: OscsListResp = self
-            .help
-            .post_json(OSCS_LIST_URL, &params)
-            .await?
+        let post_json_res = self.help.post_json(OSCS_LIST_URL, &params).await?;
+        let oscs_list_resp: OscsListResp = post_json_res
             .json()
-            .await?;
+            .await
+            .with_context(|_| HttpClientErrSnafu { url: OSCS_LIST_URL })?;
         Ok(oscs_list_resp)
     }
 
@@ -78,9 +78,8 @@ impl OscCrawler {
             .get_list_resp(OSCS_PAGE_DEFAULT, OSCS_PER_PAGE_DEFAULT)
             .await?;
         let total = oscs_list_resp.data.total;
-        if total <= 0 {
-            return Err(Error::Message("oscs get total error".to_owned()));
-        }
+        ensure!(total > 0, InvalidOscsListTotalSnafu,);
+
         let page_count = total / OSCS_PAGE_SIZE;
         if page_count == 0 {
             return Ok(1);
@@ -119,9 +118,13 @@ impl OscCrawler {
 
     pub async fn parse_detail(&self, mps: &str) -> Result<VulnInfo> {
         let detail = self.get_detail_resp(mps).await?;
-        if detail.code != 200 || !detail.success || detail.data.is_empty() {
-            return Err(Error::Message(format!("oscs get: {} detail error", mps)));
-        };
+        ensure!(
+            detail.code == 200 && detail.success && !detail.data.is_empty(),
+            InvalidOscsDetailSnafu {
+                mps,
+                code: detail.code
+            }
+        );
         let data = detail.data[0].clone();
         let severity = self.get_severity(&data.level);
         let disclosure = timestamp_to_date(data.publish_time)?;
@@ -148,6 +151,7 @@ impl OscCrawler {
             reasons: vec![],
             github_search: vec![],
             is_valuable,
+            pushed: false,
         };
         Ok(data)
     }
@@ -174,12 +178,14 @@ impl OscCrawler {
         let params = serde_json::json!({
             "vuln_no": mps,
         });
-        let detail: OscsDetailResp = self
-            .help
-            .post_json(OSCS_DETAIL_URL, &params)
-            .await?
-            .json()
-            .await?;
+        let post_json_res = self.help.post_json(OSCS_DETAIL_URL, &params).await?;
+        let detail: OscsDetailResp =
+            post_json_res
+                .json()
+                .await
+                .with_context(|_| HttpClientErrSnafu {
+                    url: OSCS_DETAIL_URL,
+                })?;
         Ok(detail)
     }
 

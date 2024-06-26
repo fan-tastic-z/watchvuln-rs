@@ -1,14 +1,14 @@
 use std::time::SystemTime;
 
 use crate::{
-    error::{Error, Result},
+    error::{DingPushErrSnafu, HttpClientErrSnafu, Result, SystemTimeErrSnafu},
     utils::{calc_hmac_sha256, http_client::Help},
 };
 use async_trait::async_trait;
 use base64::prelude::*;
 use reqwest::header;
 use serde::{Deserialize, Serialize};
-use tracing::warn;
+use snafu::{ensure, ResultExt};
 
 use super::MessageBot;
 
@@ -37,25 +37,26 @@ impl MessageBot for DingDing {
 
         let sign = self.generate_sign()?;
 
-        let res: DingResponse = help
+        let send_res = help
             .http_client
             .post(DING_API_URL)
             .query(&sign)
             .json(&message)
             .send()
-            .await?
-            .json()
-            .await?;
+            .await
+            .with_context(|_| HttpClientErrSnafu { url: DING_API_URL })?;
 
-        if res.errcode != 0 {
-            warn!(
-                "ding push markdown message error, err msg is {}",
-                res.errmsg
-            );
-            return Err(Error::Message(
-                "ding push markdown message response errorcode not eq 0".to_owned(),
-            ));
-        }
+        let res: DingResponse = send_res
+            .json()
+            .await
+            .with_context(|_| HttpClientErrSnafu { url: DING_API_URL })?;
+
+        ensure!(
+            res.errcode != 0,
+            DingPushErrSnafu {
+                errorcode: res.errcode
+            }
+        );
         Ok(())
     }
 }
@@ -75,7 +76,8 @@ impl DingDing {
     }
     pub fn generate_sign(&self) -> Result<Sign> {
         let timestamp = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)?
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .context(SystemTimeErrSnafu)?
             .as_millis();
         let timestamp_and_secret = &format!("{}\n{}", timestamp, self.secret_token);
         let hmac_sha256 = calc_hmac_sha256(

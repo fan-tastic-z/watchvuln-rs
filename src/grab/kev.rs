@@ -2,10 +2,11 @@ use async_trait::async_trait;
 use chrono::{DateTime, FixedOffset};
 use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
+use snafu::ResultExt;
 use tracing::info;
 
 use super::{Grab, VulnInfo};
-use crate::error::Result;
+use crate::error::{HttpClientErrSnafu, Result};
 use crate::{grab::Severity, utils::http_client::Help};
 
 const KEV_URL: &str =
@@ -23,7 +24,11 @@ pub struct KevCrawler {
 #[async_trait]
 impl Grab for KevCrawler {
     async fn get_update(&self, page_limit: i32) -> Result<Vec<VulnInfo>> {
-        let kev_list_resp: KevResp = self.help.get_json(KEV_URL).await?.json().await?;
+        let get_json_res = self.help.get_json(KEV_URL).await?;
+        let kev_list_resp: KevResp = get_json_res
+            .json()
+            .await
+            .with_context(|_| HttpClientErrSnafu { url: KEV_URL })?;
         let all_count = kev_list_resp.vulnerabilities.len();
         let item_limit = if page_limit as usize * KEV_PAGE_SIZE > all_count {
             all_count
@@ -58,6 +63,7 @@ impl Grab for KevCrawler {
                 github_search: vec![],
                 reasons: vec![],
                 is_valuable,
+                pushed: false,
             };
             res.push(vuln_info)
         }
@@ -116,7 +122,13 @@ mod tests {
     #[tokio::test]
     async fn test_get_key_res() -> Result<()> {
         let kev = KevCrawler::new();
-        let kev_list_resp: KevResp = kev.help.get_json(KEV_URL).await?.json().await?;
+        let kev_list_resp: KevResp = kev
+            .help
+            .get_json(KEV_URL)
+            .await?
+            .json()
+            .await
+            .with_context(|_| HttpClientErrSnafu { url: KEV_URL })?;
         let mut vulnerabilities = kev_list_resp.vulnerabilities;
         vulnerabilities.sort_by(|a, b| b.date_added.cmp(&a.date_added));
         println!("{:?}", vulnerabilities);

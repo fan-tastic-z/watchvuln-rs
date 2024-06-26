@@ -1,12 +1,15 @@
 use async_trait::async_trait;
-use eyre::eyre;
 use regex::Regex;
 use reqwest::{header, Url};
 use scraper::{Html, Selector};
+use snafu::{ensure, OptionExt, ResultExt};
 use tracing::{debug, info, warn};
 
 use crate::{
-    error::{Error, Result},
+    error::{
+        ParseIntErrSnafu, ParseUrlErrSnafu, RegexCapturesErrSnafu, RegexErrSnafu, Result,
+        SelectNthErrSnafu, SelectorSnafu,
+    },
     grab::{Severity, VulnInfo},
     utils::http_client::Help,
 };
@@ -59,17 +62,23 @@ impl AVDCrawler {
 
     pub async fn get_page_count(&self) -> Result<i32> {
         let content = self.help.get_html_content(&self.link).await?;
-        let cap = Regex::new(PAGE_REGEXP)?.captures(&content);
-        if let Some(res) = cap {
-            if res.len() == 2 {
-                let total = res[1].parse::<i32>()?;
-                Ok(total)
-            } else {
-                Err(Error::Message("page regex match error".to_owned()))
+        let captures = Regex::new(PAGE_REGEXP)
+            .with_context(|_| RegexErrSnafu { re: PAGE_REGEXP })?
+            .captures(&content)
+            .with_context(|| RegexCapturesErrSnafu {
+                msg: "captures page content page info not found".to_string(),
+            })?;
+        ensure!(
+            captures.len() == 2,
+            RegexCapturesErrSnafu {
+                msg: "captures page content page len not eq 2".to_string()
             }
-        } else {
-            Err(Error::Message("page regex match not found".to_owned()))
-        }
+        );
+        captures[1]
+            .parse::<i32>()
+            .with_context(|_| ParseIntErrSnafu {
+                num: captures[1].to_string(),
+            })
     }
 
     pub async fn parse_page(&self, page: i32) -> Result<Vec<VulnInfo>> {
@@ -80,16 +89,20 @@ impl AVDCrawler {
         for detail in detail_links {
             let data = self.parse_detail_page(detail.as_ref()).await;
             match data {
-                Ok(data) => res.push(data),
-                Err(err) => warn!("crawing detail {} error {}", detail, err),
+                Ok(data) => {
+                    if data.cve.is_empty() && data.disclosure.is_empty() {
+                        continue;
+                    }
+                    res.push(data);
+                }
+                Err(err) => warn!("crawing detail {} error {:?}", detail, err),
             }
         }
         Ok(res)
     }
 
     fn get_detail_links(&self, document: Html) -> Result<Vec<String>> {
-        let src_url_selector =
-            Selector::parse("tbody tr td a").map_err(|err| eyre!("parse html error {}", err))?;
+        let src_url_selector = Selector::parse("tbody tr td a").context(SelectorSnafu)?;
 
         let detail_links: Vec<String> = document
             .select(&src_url_selector)
@@ -119,10 +132,6 @@ impl AVDCrawler {
             tags.push(utilization);
         }
 
-        if cve_id.is_empty() && disclosure.is_empty() {
-            return Err(eyre!("invalid vuln data in {}", href).into());
-        }
-
         let severity = self.get_severity(&document)?;
 
         let title = self.get_title(&document)?;
@@ -148,12 +157,13 @@ impl AVDCrawler {
             reasons: vec![],
             github_search: vec![],
             is_valuable,
+            pushed: false,
         };
         Ok(data)
     }
 
     fn get_avd_id(&self, detail_url: &str) -> Result<String> {
-        let url = Url::parse(detail_url)?;
+        let url = Url::parse(detail_url).with_context(|_| ParseUrlErrSnafu { url: detail_url })?;
         let avd_id = url
             .query_pairs()
             .filter(|(key, _)| key == "id")
@@ -164,8 +174,7 @@ impl AVDCrawler {
     }
 
     fn get_references(&self, document: &Html) -> Result<Vec<String>> {
-        let reference_selector = Selector::parse("td[nowrap='nowrap'] a")
-            .map_err(|err| eyre!("avd get references selector parse error {}", err))?;
+        let reference_selector = Selector::parse("td[nowrap='nowrap'] a").context(SelectorSnafu)?;
         let references = document
             .select(&reference_selector)
             .filter_map(|el| el.attr("href"))
@@ -175,12 +184,11 @@ impl AVDCrawler {
     }
 
     fn get_solutions(&self, document: &Html) -> Result<String> {
-        let solutions_selector = Selector::parse(".text-detail")
-            .map_err(|err| eyre!("avd get solutions selector parse error {}", err))?;
+        let solutions_selector = Selector::parse(".text-detail").context(SelectorSnafu)?;
         let solutions = document
             .select(&solutions_selector)
             .nth(1)
-            .ok_or_else(|| Error::Message("avd solutions value not found".to_string()))?
+            .with_context(|| SelectNthErrSnafu { nth: 1_usize })?
             .text()
             .map(|el| el.trim())
             .collect::<Vec<_>>()
@@ -189,8 +197,7 @@ impl AVDCrawler {
     }
 
     fn get_description(&self, document: &Html) -> Result<String> {
-        let description_selector = Selector::parse(".text-detail div")
-            .map_err(|err| eyre!("avd get description selector parse error {}", err))?;
+        let description_selector = Selector::parse(".text-detail div").context(SelectorSnafu)?;
         let description = document
             .select(&description_selector)
             .map(|e| e.text().collect::<String>())
@@ -201,11 +208,11 @@ impl AVDCrawler {
 
     fn get_title(&self, document: &Html) -> Result<String> {
         let title_selector = Selector::parse("h5[class='header__title'] .header__title__text")
-            .map_err(|err| eyre!("avd get title selector parse error {}", err))?;
+            .context(SelectorSnafu)?;
         let title = document
             .select(&title_selector)
             .nth(0)
-            .ok_or_else(|| eyre!("avd title value not found"))?
+            .with_context(|| SelectNthErrSnafu { nth: 0_usize })?
             .inner_html()
             .trim()
             .to_string();
@@ -213,12 +220,12 @@ impl AVDCrawler {
     }
 
     fn get_severity(&self, document: &Html) -> Result<Severity> {
-        let level_selector = Selector::parse("h5[class='header__title'] .badge")
-            .map_err(|err| eyre!("avd get severity selector parse error {}", err))?;
+        let level_selector =
+            Selector::parse("h5[class='header__title'] .badge").context(SelectorSnafu)?;
         let level = document
             .select(&level_selector)
             .nth(0)
-            .ok_or_else(|| eyre!("avd level value not found"))?
+            .with_context(|| SelectNthErrSnafu { nth: 0_usize })?
             .inner_html()
             .trim()
             .to_string();
@@ -233,12 +240,11 @@ impl AVDCrawler {
     }
 
     fn get_mertric_value(&self, document: &Html, index: usize) -> Result<String> {
-        let value_selector =
-            Selector::parse(".metric-value").map_err(|err| eyre!("parse html error {}", err))?;
+        let value_selector = Selector::parse(".metric-value").context(SelectorSnafu)?;
         let metric_value = document
             .select(&value_selector)
             .nth(index)
-            .ok_or_else(|| eyre!("avd metric value not found"))?
+            .with_context(|| SelectNthErrSnafu { nth: index })?
             .inner_html()
             .trim()
             .to_string();
@@ -247,7 +253,9 @@ impl AVDCrawler {
 
     fn get_cve_id(&self, document: &Html) -> Result<String> {
         let mut cve_id = self.get_mertric_value(document, 0)?;
-        if !Regex::new(CVEID_REGEXP)?.is_match(&cve_id) {
+        let regex =
+            Regex::new(CVEID_REGEXP).with_context(|_| RegexErrSnafu { re: CVEID_REGEXP })?;
+        if !regex.is_match(&cve_id) {
             cve_id = "".to_string();
         }
         Ok(cve_id)

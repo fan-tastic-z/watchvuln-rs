@@ -1,10 +1,11 @@
 use async_trait::async_trait;
 use reqwest::header;
 use serde::{Deserialize, Serialize};
+use snafu::ResultExt;
 use tracing::info;
 
 use crate::{
-    error::Result,
+    error::{HttpClientErrSnafu, Result},
     grab::Severity,
     utils::{check_over_two_week, http_client::Help},
 };
@@ -26,8 +27,12 @@ pub struct ThreadBookCrawler {
 impl Grab for ThreadBookCrawler {
     async fn get_update(&self, _page_limit: i32) -> Result<Vec<VulnInfo>> {
         let crawler = ThreadBookCrawler::new();
-        let home_page_resp: ThreadBookHomePage =
-            crawler.help.get_json(HOME_PAGE_URL).await?.json().await?;
+        let get_json_res = crawler.help.get_json(HOME_PAGE_URL).await?;
+        let home_page_resp: ThreadBookHomePage = get_json_res
+            .json()
+            .await
+            .with_context(|_| HttpClientErrSnafu { url: HOME_PAGE_URL })?;
+
         let mut res = Vec::with_capacity(home_page_resp.data.high_risk.len());
         for v in home_page_resp.data.high_risk {
             let mut is_valuable = false;
@@ -67,6 +72,7 @@ impl Grab for ThreadBookCrawler {
                 reasons: Vec::new(),
                 github_search: vec![],
                 is_valuable,
+                pushed: false,
             };
             res.push(vuln);
         }
@@ -148,8 +154,13 @@ mod tests {
     #[tokio::test]
     async fn test_get_threat_book_homepage() -> Result<()> {
         let crawler = ThreadBookCrawler::new();
-        let res: ThreadBookHomePage = crawler.help.get_json(HOME_PAGE_URL).await?.json().await?;
-        info!("{:?}", res);
+        let get_json_res = crawler.help.get_json(HOME_PAGE_URL).await?;
+        let home_page_resp: ThreadBookHomePage = get_json_res
+            .json()
+            .await
+            .with_context(|_| HttpClientErrSnafu { url: HOME_PAGE_URL })?;
+
+        info!("{:?}", home_page_resp);
         Ok(())
     }
 }

@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use crate::{
     environment::Environment,
-    error::{Error, Result},
+    error::{ConfigErrSnafu, IoSnafu, Result, SerdeYamlErrSnafu},
     logger,
     utils::render_string,
 };
@@ -10,6 +10,7 @@ use fs_err as fs;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use snafu::{OptionExt, ResultExt};
 
 lazy_static! {
     static ref DEFAULT_FOLDER: PathBuf = PathBuf::from("config");
@@ -39,12 +40,13 @@ impl Config {
         let selected_path = files
             .iter()
             .find(|p| p.exists())
-            .ok_or_else(|| Error::Message("no configuration file found".to_string()))?;
+            .with_context(|| ConfigErrSnafu {
+                msg: format!("config file {env}.local.yaml or {env}.yaml not found"),
+            })?;
 
-        let content = fs::read_to_string(selected_path)?;
+        let content = fs::read_to_string(selected_path).with_context(|_| IoSnafu)?;
         let rendered = render_string(&content, &json!({}))?;
-        serde_yaml::from_str(&rendered)
-            .map_err(|err| Error::YAMLFile(err, selected_path.to_string_lossy().to_string()))
+        serde_yaml::from_str(&rendered).with_context(|_| SerdeYamlErrSnafu)
     }
 }
 
