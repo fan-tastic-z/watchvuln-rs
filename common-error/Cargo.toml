@@ -1,0 +1,9 @@
+[package]
+name = "common-error"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+strum = { version = "0.25", features = ["derive"] }
+tonic = { version = "0.11", features = ["tls", "gzip", "zstd"] }
+snafu = "0.8.3"

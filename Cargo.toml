@@ -6,10 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace]
-members = ["./migration", "."]
+members = ["./migration", ".", "macros", "common-error"]
 
 [dependencies]
-thiserror = "1"
 clap = { version = "4.5.4", features = ["derive"] }
 
 serde = { version = "1", features = ["derive"] }
@@ -18,7 +17,6 @@ serde_yaml = "0.9"
 serde_variant = "0.1"
 
 lazy_static = "1.4"
-eyre = "0.6.12"
 fs-err = "2.11"
 tera = "1.19.1"
 
@@ -58,3 +56,6 @@ hmac = "0.12.1"
 base64 = "0.22.1"
 chrono-tz = "0.9.0"
 octocrab = "0.38.0"
+snafu = "0.8.3"
+macros = { path = "macros" }
+common-error = { path = "common-error" }

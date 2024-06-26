@@ -32,11 +32,12 @@ pub struct VulnInfo {
     pub reasons: Vec<String>,
     pub github_search: Vec<String>,
     pub is_valuable: bool,
+    pub pushed: bool,
 }
 
 impl From<Model> for VulnInfo {
     fn from(v: Model) -> Self {
-        let severtiy = match v.severtiy.as_str() {
+        let severity = match v.severtiy.as_str() {
             "Low" => Severity::Low,
             "Medium" => Severity::Medium,
             "High" => Severity::High,
@@ -56,7 +57,7 @@ impl From<Model> for VulnInfo {
             unique_key: v.key,
             title: v.title,
             description: v.description,
-            severity: severtiy,
+            severity,
             cve: v.cve,
             disclosure: v.disclosure,
             references,
@@ -66,6 +67,7 @@ impl From<Model> for VulnInfo {
             reasons,
             github_search,
             is_valuable: v.is_valuable,
+            pushed: v.pushed,
         }
     }
 }

@@ -1,5 +1,6 @@
-use crate::error::Result;
+use crate::error::{Result, TeloxideErrSnafu};
 use async_trait::async_trait;
+use snafu::ResultExt;
 use teloxide::{prelude::*, types::ParseMode};
 
 use super::{msg_template::escape_markdown, MessageBot};
@@ -18,7 +19,8 @@ impl MessageBot for Telegram {
             .send_message(self.chat_id, msg)
             .parse_mode(ParseMode::MarkdownV2)
             .send()
-            .await?;
+            .await
+            .context(TeloxideErrSnafu)?;
         Ok(())
     }
 }

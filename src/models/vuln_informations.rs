@@ -2,36 +2,49 @@ use sea_orm::{
     ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, EntityTrait, PaginatorTrait,
     QueryFilter, TransactionTrait,
 };
+use snafu::{ensure, OptionExt, ResultExt};
 use tracing::info;
 
-use crate::{grab::VulnInfo, models::ModelError};
+use crate::{
+    error::{DbAlreadyExistsSnafu, DbErrSnafu, DbNotFoundErrSnafu, Result},
+    grab::VulnInfo,
+};
 
-use super::{ModelResult, _entities::vuln_informations};
+use super::_entities::vuln_informations;
 
 const REASON_NEW_CREATED: &str = "漏洞创建";
 const REASON_TAG_UPDATED: &str = "标签更新";
 const REASON_SEVERITY_UPDATE: &str = "等级更新";
 
 impl super::_entities::vuln_informations::Model {
-    pub async fn find_by_id(db: &DatabaseConnection, key: &str) -> ModelResult<Self> {
+    pub async fn find_by_id(db: &DatabaseConnection, key: &str) -> Result<Self> {
         let vuln = vuln_informations::Entity::find()
             .filter(vuln_informations::Column::Key.eq(key))
             .one(db)
-            .await?;
-        vuln.ok_or_else(|| ModelError::EntityNotFound)
+            .await
+            .context(DbErrSnafu)?;
+        let res = vuln.with_context(|| DbNotFoundErrSnafu {
+            table: "vuln_informations".to_string(),
+            filter: key.to_string(),
+        })?;
+        Ok(res)
     }
 
-    pub async fn query_count(db: &DatabaseConnection) -> ModelResult<u64> {
-        let count = vuln_informations::Entity::find().count(db).await?;
+    pub async fn query_count(db: &DatabaseConnection) -> Result<u64> {
+        let count = vuln_informations::Entity::find()
+            .count(db)
+            .await
+            .context(DbErrSnafu)?;
         Ok(count)
     }
 
-    pub async fn creat_or_update(db: &DatabaseConnection, mut vuln: VulnInfo) -> ModelResult<Self> {
-        let txn = db.begin().await?;
+    pub async fn creat_or_update(db: &DatabaseConnection, mut vuln: VulnInfo) -> Result<Self> {
+        let txn = db.begin().await.context(DbErrSnafu)?;
         let v = vuln_informations::Entity::find()
             .filter(vuln_informations::Column::Key.eq(vuln.unique_key.clone()))
             .one(&txn)
-            .await?;
+            .await
+            .context(DbErrSnafu)?;
         if let Some(v) = v {
             let mut vuln_model: vuln_informations::ActiveModel = v.into();
             let mut as_new_vuln = false;
@@ -78,26 +91,30 @@ impl super::_entities::vuln_informations::Model {
                     as_new_vuln = true
                 }
             }
-            if as_new_vuln {
-                vuln_model.title = ActiveValue::set(vuln.title);
-                vuln_model.description = ActiveValue::set(vuln.description);
-                vuln_model.severtiy = ActiveValue::set(vuln.severity.to_string());
-                vuln_model.disclosure = ActiveValue::set(vuln.disclosure);
-                vuln_model.solutions = ActiveValue::set(vuln.solutions);
-                vuln_model.references = ActiveValue::set(Some(vuln.references));
-                vuln_model.tags = ActiveValue::set(Some(vuln.tags));
-                vuln_model.from = ActiveValue::set(vuln.from);
-                vuln_model.reasons = ActiveValue::set(Some(vuln.reasons));
-                vuln_model.is_valuable = ActiveValue::set(vuln.is_valuable);
-                // if tags or severtiy update should set pushed false, repush
-                vuln_model.pushed = ActiveValue::set(false);
-                let m = vuln_model.update(&txn).await?;
-                txn.commit().await?;
-                return Ok(m);
-            }
-            return Err(ModelError::EntityAlreadyExists {
-                key: vuln.unique_key,
-            });
+
+            ensure!(
+                as_new_vuln,
+                DbAlreadyExistsSnafu {
+                    table: "vuln_informations".to_string(),
+                    filter: vuln.unique_key.clone()
+                }
+            );
+
+            vuln_model.title = ActiveValue::set(vuln.title);
+            vuln_model.description = ActiveValue::set(vuln.description);
+            vuln_model.severtiy = ActiveValue::set(vuln.severity.to_string());
+            vuln_model.disclosure = ActiveValue::set(vuln.disclosure);
+            vuln_model.solutions = ActiveValue::set(vuln.solutions);
+            vuln_model.references = ActiveValue::set(Some(vuln.references));
+            vuln_model.tags = ActiveValue::set(Some(vuln.tags));
+            vuln_model.from = ActiveValue::set(vuln.from);
+            vuln_model.reasons = ActiveValue::set(Some(vuln.reasons));
+            vuln_model.is_valuable = ActiveValue::set(vuln.is_valuable);
+            // if tags or severtiy update should set pushed false, repush
+            vuln_model.pushed = ActiveValue::set(false);
+            let m = vuln_model.update(&txn).await.context(DbErrSnafu)?;
+            txn.commit().await.context(DbErrSnafu)?;
+            return Ok(m);
         }
         vuln.reasons.push(REASON_NEW_CREATED.to_owned());
         let v = vuln_informations::ActiveModel {
@@ -117,8 +134,9 @@ impl super::_entities::vuln_informations::Model {
             ..Default::default()
         }
         .insert(&txn)
-        .await?;
-        txn.commit().await?;
+        .await
+        .context(DbErrSnafu)?;
+        txn.commit().await.context(DbErrSnafu)?;
         Ok(v)
     }
 
@@ -126,54 +144,57 @@ impl super::_entities::vuln_informations::Model {
         db: &DatabaseConnection,
         key: &str,
         links: Vec<String>,
-    ) -> ModelResult<()> {
-        let txn = db.begin().await?;
+    ) -> Result<()> {
+        let txn = db.begin().await.context(DbErrSnafu)?;
         let v = vuln_informations::Entity::find()
             .filter(vuln_informations::Column::Key.eq(key))
             .one(&txn)
-            .await?;
-        if let Some(v) = v {
-            let mut v: vuln_informations::ActiveModel = v.into();
-            v.github_search = ActiveValue::set(Some(links));
-            v.update(&txn).await?;
-            txn.commit().await?;
-            Ok(())
-        } else {
-            Err(ModelError::EntityUpdateNotFound {
-                key: key.to_string(),
-            })
-        }
+            .await
+            .context(DbErrSnafu)?;
+        let res = v.with_context(|| DbNotFoundErrSnafu {
+            table: "vuln_informations".to_string(),
+            filter: key.to_string(),
+        })?;
+        let mut v: vuln_informations::ActiveModel = res.into();
+        v.github_search = ActiveValue::set(Some(links));
+        v.update(&txn).await.context(DbErrSnafu)?;
+        txn.commit().await.context(DbErrSnafu)?;
+        Ok(())
     }
 
-    pub async fn update_pushed_by_key(db: &DatabaseConnection, key: String) -> ModelResult<()> {
-        let txn = db.begin().await?;
+    pub async fn update_pushed_by_key(db: &DatabaseConnection, key: String) -> Result<()> {
+        let txn = db.begin().await.context(DbErrSnafu)?;
         let v = vuln_informations::Entity::find()
             .filter(vuln_informations::Column::Key.eq(key.clone()))
             .one(&txn)
-            .await?;
-        if let Some(v) = v {
-            let mut v: vuln_informations::ActiveModel = v.into();
-            v.pushed = ActiveValue::set(true);
-            v.update(&txn).await?;
-            txn.commit().await?;
-            Ok(())
-        } else {
-            Err(ModelError::EntityUpdateNotFound { key })
-        }
+            .await
+            .context(DbErrSnafu)?;
+
+        let res = v.with_context(|| DbNotFoundErrSnafu {
+            table: "vuln_informations".to_string(),
+            filter: key,
+        })?;
+        let mut v: vuln_informations::ActiveModel = res.into();
+        v.pushed = ActiveValue::set(true);
+        v.update(&txn).await.context(DbErrSnafu)?;
+        txn.commit().await.context(DbErrSnafu)?;
+        Ok(())
     }
 
-    pub async fn create(db: &DatabaseConnection, vuln: VulnInfo) -> ModelResult<Self> {
-        let txn = db.begin().await?;
-        if vuln_informations::Entity::find()
+    pub async fn create(db: &DatabaseConnection, vuln: VulnInfo) -> Result<Self> {
+        let txn = db.begin().await.context(DbErrSnafu)?;
+        let res = vuln_informations::Entity::find()
             .filter(vuln_informations::Column::Key.eq(vuln.unique_key.clone()))
             .one(&txn)
-            .await?
-            .is_some()
-        {
-            return Err(ModelError::EntityAlreadyExists {
-                key: vuln.unique_key,
-            });
-        }
+            .await
+            .context(DbErrSnafu)?;
+        ensure!(
+            res.is_some(),
+            DbAlreadyExistsSnafu {
+                table: "vuln_informations".to_string(),
+                filter: vuln.unique_key.clone(),
+            }
+        );
         let v = vuln_informations::ActiveModel {
             key: ActiveValue::set(vuln.unique_key),
             title: ActiveValue::set(vuln.title),
@@ -189,8 +210,9 @@ impl super::_entities::vuln_informations::Model {
             ..Default::default()
         }
         .insert(&txn)
-        .await?;
-        txn.commit().await?;
+        .await
+        .context(DbErrSnafu)?;
+        txn.commit().await.context(DbErrSnafu)?;
         Ok(v)
     }
 }

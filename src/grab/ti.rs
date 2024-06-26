@@ -1,10 +1,11 @@
 use async_trait::async_trait;
 use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
+use snafu::ResultExt;
 use tracing::info;
 
 use super::{Grab, Severity, VulnInfo};
-use crate::error::Result;
+use crate::error::{HttpClientErrSnafu, Result};
 use crate::utils::http_client::Help;
 
 const ONE_URL: &str = "https://ti.qianxin.com/alpha-api/v2/vuln/one-day";
@@ -51,7 +52,12 @@ impl TiCrawler {
 
     pub async fn get_ti_one_day_resp(&self) -> Result<TiOneDayResp> {
         let params = serde_json::json!({});
-        let resp: TiOneDayResp = self.help.post_json(ONE_URL, &params).await?.json().await?;
+        let post_json = self.help.post_json(ONE_URL, &params).await?;
+
+        let resp: TiOneDayResp = post_json
+            .json()
+            .await
+            .with_context(|_| HttpClientErrSnafu { url: ONE_URL })?;
         Ok(resp)
     }
 
@@ -77,6 +83,7 @@ impl TiCrawler {
                 reasons: vec![],
                 github_search: vec![],
                 is_valuable,
+                pushed: false,
             };
             if vuln_infos
                 .iter()

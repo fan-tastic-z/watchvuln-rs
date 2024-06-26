@@ -1,114 +1,249 @@
 use std::{num::ParseIntError, time::SystemTimeError};
 
 use hmac::digest::crypto_common;
+use macros::stack_trace_debug;
 use migration::sea_orm;
+use scraper::error::SelectorErrorKind;
+use snafu::{Location, Snafu};
 
-pub type Result<T, E = Error> = std::result::Result<T, E>;
+pub type Result<T, E = AppError> = std::result::Result<T, E>;
 
-#[derive(thiserror::Error, Debug)]
-pub enum Error {
-    #[error("{inner}\n{backtrace}")]
-    WithBacktrace {
-        inner: Box<Self>,
-        backtrace: Box<std::backtrace::Backtrace>,
+#[derive(Snafu)]
+#[snafu(visibility(pub))]
+#[stack_trace_debug]
+pub enum AppError {
+    #[snafu(display("IO error"))]
+    Io {
+        #[snafu(source)]
+        error: std::io::Error,
+        #[snafu(implicit)]
+        location: Location,
     },
 
-    // Model
-    #[error(transparent)]
-    Model(#[from] crate::models::ModelError),
+    #[snafu(display("db error"))]
+    DbErr {
+        #[snafu(source)]
+        error: sea_orm::DbErr,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error("{0}")]
-    Message(String),
+    #[snafu(display("db table {} filter by {} not found", table, filter))]
+    DbNotFoundErr {
+        table: String,
+        filter: String,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    HmacError(#[from] crypto_common::InvalidLength),
+    #[snafu(display("db table {} filter by {} altread exists", table, filter))]
+    DbAlreadyExists {
+        table: String,
+        filter: String,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    CronScheduler(#[from] tokio_cron_scheduler::JobSchedulerError),
+    #[snafu(display("cron scheduler error"))]
+    CronSchedulerErr {
+        #[snafu(source)]
+        error: tokio_cron_scheduler::JobSchedulerError,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    Reqwest(#[from] reqwest::Error),
+    #[snafu(display("request url {url} error"))]
+    HttpClientErr {
+        url: String,
+        #[snafu(source)]
+        error: reqwest::Error,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    Regex(#[from] regex::Error),
+    #[snafu(display("regex new {re} error"))]
+    RegexErr {
+        re: String,
+        #[snafu(source)]
+        error: regex::Error,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    ParseInt(#[from] ParseIntError),
+    #[snafu(display("regex captures error: {msg}"))]
+    RegexCapturesErr {
+        msg: String,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    ParseUrl(#[from] url::ParseError),
+    #[snafu(display("parse {num} to int error"))]
+    ParseIntErr {
+        num: String,
+        #[snafu(source)]
+        error: ParseIntError,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    DB(#[from] sea_orm::DbErr),
+    #[snafu(display("parse {url} error"))]
+    ParseUrlErr {
+        url: String,
+        #[snafu(source)]
+        error: url::ParseError,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    Join(#[from] tokio::task::JoinError),
+    #[snafu(display("task join error"))]
+    TaskJoinErr {
+        #[snafu(source)]
+        error: tokio::task::JoinError,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    Tera(#[from] tera::Error),
+    #[snafu(display("tera error"))]
+    TeraErr {
+        #[snafu(source)]
+        error: tera::Error,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    JSON(serde_json::Error),
+    #[snafu(display("crypto error"))]
+    CryptoError {
+        #[snafu(source)]
+        error: crypto_common::InvalidLength,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error("cannot parse `{1}`: {0}")]
-    YAMLFile(#[source] serde_yaml::Error, String),
+    #[snafu(display("json error"))]
+    JsonErr {
+        #[snafu(source)]
+        error: serde_json::Error,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    YAML(#[from] serde_yaml::Error),
+    #[snafu(display("teloxide request error"))]
+    TeloxideErr {
+        #[snafu(source)]
+        error: teloxide::RequestError,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    TELOXIDE(#[from] teloxide::RequestError),
+    #[snafu(display("octocrab search {search} error"))]
+    OctocrabErr {
+        search: String,
+        #[snafu(source)]
+        error: octocrab::Error,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    EnvVar(#[from] std::env::VarError),
+    #[snafu(display("chrono parse {date} error"))]
+    ChronoParseErr {
+        date: String,
+        #[snafu(source)]
+        error: chrono::ParseError,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    IO(#[from] std::io::Error),
+    #[snafu(display("system time error"))]
+    SystemTimeErr {
+        #[snafu(source)]
+        error: SystemTimeError,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    DateParse(#[from] chrono::ParseError),
+    #[snafu(display("Illegal config msg: {msg}"))]
+    ConfigErr {
+        msg: String,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    SystemTime(#[from] SystemTimeError),
+    #[snafu(display("serde yaml error"))]
+    SerdeYamlErr {
+        #[snafu(source)]
+        error: serde_yaml::Error,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    Octocrab(#[from] octocrab::Error),
+    #[snafu(display("timestamp {timestamp} to datetime error"))]
+    DateTimeFromTimestampErr {
+        timestamp: i64,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    Any(#[from] Box<dyn std::error::Error + Send + Sync>),
+    #[snafu(display("scraper selector error"))]
+    SelectorError {
+        #[snafu(source)]
+        error: SelectorErrorKind<'static>,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    #[error(transparent)]
-    Anyhow(#[from] eyre::Report),
-}
+    #[snafu(display("html selector nth {} not found", nth))]
+    SelectNthErr {
+        nth: usize,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-impl Error {
-    pub fn wrap(err: impl std::error::Error + Send + Sync + 'static) -> Self {
-        Self::Any(Box::new(err))
-    }
+    #[snafu(display("html element attr {} not found", attr))]
+    ElementAttrErr {
+        attr: String,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    pub fn msg(err: impl std::error::Error + Send + Sync + 'static) -> Self {
-        Self::Message(err.to_string())
-    }
+    #[snafu(display("ding push markdown message response errorcode {errorcode}"))]
+    DingPushErr {
+        errorcode: i64,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    pub fn string(s: &str) -> Self {
-        Self::Message(s.to_string())
-    }
+    #[snafu(display("lark push markdown message response code {code}"))]
+    LarkPushErr {
+        code: i64,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-    pub fn bt(self) -> Self {
-        let backtrace = std::backtrace::Backtrace::capture();
-        match backtrace.status() {
-            std::backtrace::BacktraceStatus::Disabled
-            | std::backtrace::BacktraceStatus::Unsupported => self,
-            _ => Self::WithBacktrace {
-                inner: Box::new(self),
-                backtrace: Box::new(backtrace),
-            },
-        }
-    }
-}
+    // detail.code != 200 || !detail.success || detail.data.is_empty(),
+    #[snafu(display("oscs {mps} detail {code} invalid"))]
+    InvalidOscsDetail {
+        mps: String,
+        code: i64,
+        #[snafu(implicit)]
+        location: Location,
+    },
 
-impl From<serde_json::Error> for Error {
-    fn from(val: serde_json::Error) -> Self {
-        Self::JSON(val).bt()
-    }
+    #[snafu(display("oscs list total invalid"))]
+    InvalidOscsListTotal {
+        #[snafu(implicit)]
+        location: Location,
+    },
+
+    #[snafu(display("seebug parse html error"))]
+    ParseSeeBugHtmlErr {
+        #[snafu(implicit)]
+        location: Location,
+    },
+
+    #[snafu(display("Invalid seebug page num: {}", num))]
+    InvalidSeebugPageNum {
+        num: usize,
+        #[snafu(implicit)]
+        location: Location,
+    },
 }

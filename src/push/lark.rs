@@ -5,9 +5,9 @@ use reqwest::header;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Sha256;
-use tracing::warn;
+use snafu::{ensure, ResultExt};
 
-use crate::error::{Error, Result};
+use crate::error::{CryptoSnafu, HttpClientErrSnafu, LarkPushErrSnafu, Result};
 use crate::utils::http_client::Help;
 
 use super::MessageBot;
@@ -27,20 +27,20 @@ impl MessageBot for Lark {
         let help = self.get_help();
         let message = self.generate_lark_card(title, msg)?;
         let url = format!("{}/{}", LARK_HOOK_URL, self.access_token);
-        let res: LarkResponse = help
+        let url_clone = url.clone();
+        let send_res = help
             .http_client
-            .post(url)
+            .post(&url)
             .json(&message)
             .send()
-            .await?
+            .await
+            .with_context(|_| HttpClientErrSnafu { url: url_clone })?;
+        let res: LarkResponse = send_res
             .json()
-            .await?;
-        if res.code != 0 {
-            warn!("lark push markdown message error, err msg is {}", res.msg);
-            return Err(Error::Message(
-                "lark push markdown message response errorcode not eq 0".to_owned(),
-            ));
-        }
+            .await
+            .with_context(|_| HttpClientErrSnafu { url })?;
+        ensure!(res.code == 0, LarkPushErrSnafu { code: res.code });
+
         Ok(())
     }
 }
@@ -61,7 +61,8 @@ impl Lark {
 
     pub fn generate_sign(&self, timestamp: i64) -> Result<String> {
         let timestamp_and_secret = format!("{}\n{}", timestamp, self.secret_token);
-        let hmac: Hmac<Sha256> = Hmac::new_from_slice(timestamp_and_secret.as_bytes())?;
+        let hmac: Hmac<Sha256> =
+            Hmac::new_from_slice(timestamp_and_secret.as_bytes()).context(CryptoSnafu)?;
         let hmac_code = hmac.finalize().into_bytes();
         let sign = BASE64_STANDARD.encode(hmac_code);
         Ok(sign)

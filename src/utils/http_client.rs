@@ -1,5 +1,6 @@
-use crate::error::Result;
+use crate::error::{HttpClientErrSnafu, Result};
 use reqwest::header::{self, HeaderMap};
+use snafu::ResultExt;
 
 #[derive(Debug, Clone)]
 pub struct Help {
@@ -28,12 +29,27 @@ impl Help {
     }
 
     pub async fn get_json(&self, url: &str) -> Result<reqwest::Response> {
-        let content = self.http_client.get(url).send().await?;
+        let content = self
+            .http_client
+            .get(url)
+            .send()
+            .await
+            .with_context(|_| HttpClientErrSnafu { url })?;
         Ok(content)
     }
 
     pub async fn get_html_content(&self, url: &str) -> Result<String> {
-        let content = self.http_client.get(url).send().await?.text().await?;
+        let send_res = self
+            .http_client
+            .get(url)
+            .send()
+            .await
+            .with_context(|_| HttpClientErrSnafu { url })?;
+
+        let content = send_res
+            .text()
+            .await
+            .with_context(|_| HttpClientErrSnafu { url })?;
         Ok(content)
     }
 
@@ -41,7 +57,13 @@ impl Help {
     where
         Body: serde::Serialize,
     {
-        let content = self.http_client.post(url).json(body).send().await?;
+        let content = self
+            .http_client
+            .post(url)
+            .json(body)
+            .send()
+            .await
+            .with_context(|_| HttpClientErrSnafu { url })?;
         Ok(content)
     }
 }

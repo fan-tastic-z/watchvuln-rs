@@ -1,7 +1,11 @@
 use regex::Regex;
+use snafu::ResultExt;
 use tracing::{info, warn};
 
-use crate::{error::Result, utils::get_last_year_data};
+use crate::{
+    error::{OctocrabErrSnafu, RegexErrSnafu, Result},
+    utils::get_last_year_data,
+};
 
 pub async fn search_github_poc(cve_id: &str) -> Vec<String> {
     let mut res = Vec::new();
@@ -9,13 +13,13 @@ pub async fn search_github_poc(cve_id: &str) -> Vec<String> {
     match nuclei_res {
         Ok(nuclei) => res.extend(nuclei),
         Err(e) => {
-            warn!("search nucli pr error:{}", e);
+            warn!("search nucli pr error:{:?}", e);
         }
     }
     match repo_res {
         Ok(repo) => res.extend(repo),
         Err(e) => {
-            warn!("search github repo error:{}", e);
+            warn!("search github repo error:{:?}", e);
         }
     }
     res
@@ -29,14 +33,18 @@ pub async fn search_nuclei_pr(cve_id: &str) -> Result<Vec<String>> {
         .per_page(100)
         .page(1u32)
         .send()
-        .await?;
-    let re = Regex::new(&format!(r"(?i)(?:\b|/|_){}(?:\b|/|_)", cve_id))?;
+        .await
+        .with_context(|_| OctocrabErrSnafu {
+            search: cve_id.to_owned(),
+        })?;
+    let re = format!(r"(?i)(?:\b|/|_){}(?:\b|/|_)", cve_id);
+    let regex = Regex::new(re.as_str()).with_context(|_| RegexErrSnafu { re })?;
     let links = page
         .into_iter()
         .filter(|pull| pull.title.is_some() || pull.body.is_some())
         .filter(|pull| {
-            re.is_match(pull.title.as_ref().unwrap_or(&String::new()))
-                || re.is_match(pull.body.as_ref().unwrap_or(&String::new()))
+            regex.is_match(pull.title.as_ref().unwrap_or(&String::new()))
+                || regex.is_match(pull.body.as_ref().unwrap_or(&String::new()))
         })
         .filter_map(|pull| pull.html_url)
         .map(|u| u.to_string())
@@ -54,12 +62,16 @@ pub async fn search_github_repo(cve_id: &str) -> Result<Vec<String>> {
         .per_page(100)
         .page(1u32)
         .send()
-        .await?;
-    let re = Regex::new(&format!(r"(?i)(?:\b|/|_){}(?:\b|/|_)", cve_id))?;
+        .await
+        .with_context(|_| OctocrabErrSnafu {
+            search: cve_id.to_owned(),
+        })?;
+    let re = format!(r"(?i)(?:\b|/|_){}(?:\b|/|_)", cve_id);
+    let regex = Regex::new(re.as_str()).with_context(|_| RegexErrSnafu { re })?;
     let links = page
         .into_iter()
         .filter_map(|r| r.html_url)
-        .filter(|url| re.captures(url.as_str()).is_some())
+        .filter(|url| regex.captures(url.as_str()).is_some())
         .map_while(|u| Some(u.to_string()))
         .collect::<Vec<_>>();
     Ok(links)

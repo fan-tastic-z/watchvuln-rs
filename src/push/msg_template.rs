@@ -1,7 +1,8 @@
-use crate::error::Result;
+use crate::error::{JsonErrSnafu, Result};
 use crate::grab::VulnInfo;
 use crate::utils::render_string;
 use serde_json::Value;
+use snafu::ResultExt;
 
 const VULN_INFO_MSG_TEMPLATE: &str = r####"
 # {{ title }}
@@ -43,7 +44,7 @@ pub fn reader_vulninfo(mut vuln: VulnInfo) -> Result<String> {
     if vuln.references.len() > MAX_REFERENCE_LENGTH {
         vuln.references = vuln.references[..MAX_REFERENCE_LENGTH].to_vec();
     }
-    let json_value: Value = serde_json::to_value(vuln)?;
+    let json_value: Value = serde_json::to_value(vuln).context(JsonErrSnafu)?;
     let markdown = render_string(VULN_INFO_MSG_TEMPLATE, &json_value)?;
     Ok(markdown)
 }
@@ -116,6 +117,7 @@ mod tests {
             reasons,
             github_search: vec![],
             is_valuable: false,
+            pushed: false,
         };
         let res = reader_vulninfo(v)?;
         println!("{}", res);
