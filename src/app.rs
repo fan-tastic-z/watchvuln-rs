@@ -5,7 +5,7 @@ use snafu::ResultExt;
 use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::{runtime::Runtime, task::JoinSet, time};
 use tokio_cron_scheduler::{Job, JobScheduler};
-use tracing::{info, warn};
+use tracing::{error, info, warn};
 
 use crate::{
     config::Config,
@@ -220,17 +220,18 @@ impl WatchVulnApp {
             let message = msg.clone();
             let title = title.clone();
             set.spawn(async move {
-                bot_clone
-                    .push_markdown(title, message)
-                    .await
-                    .expect("push markdown error")
+                if let Err(e) = bot_clone.push_markdown(title, message).await {
+                    error!("push to bot error: {:?}", e);
+                    warn!("push to bot error: {:?}", e);
+                    return Err(format!("push to bot error:{}", e));
+                }
+                Ok(())
             });
         }
         let mut is_push = true;
         while let Some(set_res) = set.join_next().await {
             if set_res.is_err() {
                 is_push = false;
-                warn!("push message error: {:?}", set_res.err());
             }
         }
         is_push

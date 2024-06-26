@@ -81,7 +81,7 @@ impl SeeBugCrawler {
         let document = self.get_document(&url).await?;
         let selector = Selector::parse(".sebug-table tbody tr").context(SelectorSnafu)?;
         let tr_elements = document.select(&selector).collect::<Vec<_>>();
-        ensure!(tr_elements.is_empty(), ParseSeeBugHtmlErrSnafu,);
+        ensure!(!tr_elements.is_empty(), ParseSeeBugHtmlErrSnafu);
         let mut res = Vec::with_capacity(tr_elements.len());
         for el in tr_elements {
             let (href, unique_key) = match self.get_href(el) {

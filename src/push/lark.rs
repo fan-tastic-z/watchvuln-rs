@@ -39,7 +39,7 @@ impl MessageBot for Lark {
             .json()
             .await
             .with_context(|_| HttpClientErrSnafu { url })?;
-        ensure!(res.code != 0, LarkPushErrSnafu { code: res.code });
+        ensure!(res.code == 0, LarkPushErrSnafu { code: res.code });
 
         Ok(())
     }

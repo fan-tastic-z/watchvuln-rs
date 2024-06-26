@@ -52,7 +52,7 @@ impl MessageBot for DingDing {
             .with_context(|_| HttpClientErrSnafu { url: DING_API_URL })?;
 
         ensure!(
-            res.errcode != 0,
+            res.errcode == 0,
             DingPushErrSnafu {
                 errorcode: res.errcode
             }
