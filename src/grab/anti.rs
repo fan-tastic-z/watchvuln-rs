@@ -127,7 +127,7 @@ impl AntiCrawler {
 
     fn nth(&self, data: &Body, n: usize) -> String {
         if n == 0 {
-            data.body[n].content[1].data.clone()
+            data.body[n].content[2].data.clone()
         } else {
             let mut res = "".to_string();
             for c in &data.body[n].content {

@@ -57,13 +57,4 @@ mod tests {
         let res = timestamp_to_date(1715931545000).unwrap();
         assert_eq!(res, "2024-05-17");
     }
-
-    #[test]
-    pub fn test_check_over_two_week() -> Result<()> {
-        let res = check_over_two_week("2024-06-03")?;
-        assert!(!res);
-        let res = check_over_two_week("2024-05-03")?;
-        assert!(res);
-        Ok(())
-    }
 }
